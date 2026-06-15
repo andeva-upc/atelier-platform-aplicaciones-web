@@ -13,4 +13,9 @@ public class OwnerQueryService(IOwnerRepository ownerRepository) : IOwnerQuerySe
     {
         return await ownerRepository.FindOwnerByIdAsync(query.Id, cancellationToken);
     }
+
+    public async Task<Owner?> Handle(GetOwnerByUserIdQuery query, CancellationToken cancellationToken = default)
+    {
+        return await ownerRepository.FindByUserIdAsync(query.UserId, cancellationToken);
+    }
 }

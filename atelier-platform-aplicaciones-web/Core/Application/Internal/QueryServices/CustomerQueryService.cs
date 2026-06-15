@@ -13,4 +13,9 @@ public class CustomerQueryService(ICustomerRepository customerRepository) : ICus
     {
         return await customerRepository.FindCustomerByIdAsync(query.Id, cancellationToken);
     }
+
+    public async Task<Customer?> Handle(GetCustomerByUserIdQuery query, CancellationToken cancellationToken = default)
+    {
+        return await customerRepository.FindByUserIdAsync(query.UserId, cancellationToken);
+    }
 }
