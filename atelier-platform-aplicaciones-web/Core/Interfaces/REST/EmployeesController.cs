@@ -72,6 +72,18 @@ public class EmployeesController(
         return Ok(EmployeeResourceFromEntityAssembler.ToResourceFromEntity(employee));
     }
 
+    [HttpGet("user/{userId}")]
+    [SwaggerOperation(Summary = "Get an employee profile by User ID", Description = "Retrieves the details of a specific employee profile using the User ID")]
+    public async Task<ActionResult> GetEmployeeByUserId(Guid userId, CancellationToken cancellationToken)
+    {
+        var query = new GetEmployeeByUserIdQuery(new UserId(userId));
+        var employee = await employeeQueryService.Handle(query, cancellationToken);
+
+        if (employee == null) return NotFound();
+
+        return Ok(EmployeeResourceFromEntityAssembler.ToResourceFromEntity(employee));
+    }
+
     [HttpDelete("user/{userId}")]
     [SwaggerOperation(Summary = "Delete an employee profile", Description = "Deletes an existing employee profile using the user ID")]
     public async Task<ActionResult> DeleteEmployee(Guid userId, CancellationToken cancellationToken)

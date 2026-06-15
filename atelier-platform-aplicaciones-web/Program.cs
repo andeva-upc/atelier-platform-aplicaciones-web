@@ -71,6 +71,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Cargar variables de entorno y resolver placeholders en appsettings.json estilo Spring Boot (${VAR})
 ExpandConfigurationPlaceholders(builder.Configuration);
 
+// 0. Configuración de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllPolicy",
+        policy => policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+});
+
 // 1. Configuración de URLs en minúsculas y convención Kebab-Case
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
@@ -262,6 +271,8 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseGlobalExceptionHandler();
+
+app.UseCors("AllowAllPolicy");
 
 // Swagger UI habilitado para pruebas exploratorias de tu API
 app.UseSwagger();

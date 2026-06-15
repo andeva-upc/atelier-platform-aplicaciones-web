@@ -72,6 +72,18 @@ public class OwnersController(
         return Ok(OwnerResourceFromEntityAssembler.ToResourceFromEntity(owner));
     }
 
+    [HttpGet("user/{userId}")]
+    [SwaggerOperation(Summary = "Get an owner profile by User ID", Description = "Retrieves the details of a specific owner profile using the User ID")]
+    public async Task<ActionResult> GetOwnerByUserId(Guid userId, CancellationToken cancellationToken)
+    {
+        var query = new GetOwnerByUserIdQuery(new UserId(userId));
+        var owner = await ownerQueryService.Handle(query, cancellationToken);
+
+        if (owner == null) return NotFound();
+
+        return Ok(OwnerResourceFromEntityAssembler.ToResourceFromEntity(owner));
+    }
+
     [HttpDelete("user/{userId}")]
     [SwaggerOperation(Summary = "Delete an owner profile", Description = "Deletes an existing owner profile using the user ID")]
     public async Task<ActionResult> DeleteOwner(Guid userId, CancellationToken cancellationToken)
