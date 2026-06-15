@@ -20,7 +20,7 @@ public class TokenService(IOptions<TokenSettings> tokenSettings) : ITokenService
         if (string.IsNullOrEmpty(secret)) throw new Exception("JWT Secret not configured");
         var key = Encoding.ASCII.GetBytes(secret);
 
-        var expirationDays = 7; // Default to 7 days if missing
+        var expirationDays = _tokenSettings.ExpirationDays > 0 ? _tokenSettings.ExpirationDays : 7;
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
