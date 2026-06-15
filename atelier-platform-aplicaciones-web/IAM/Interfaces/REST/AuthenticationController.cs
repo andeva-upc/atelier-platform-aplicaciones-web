@@ -59,7 +59,7 @@ public class AuthenticationController(
     }
 
     [HttpPost("forgot-password")]
-    public async Task<IActionResult> ForgotPassword([FromBody] GeneratePasswordRecoveryTokenResource resource, CancellationToken cancellationToken)
+    public async Task<IActionResult> ForgotPassword([FromBody] PasswordRecoveryResource resource, CancellationToken cancellationToken)
     {
         var command = GeneratePasswordRecoveryTokenCommandFromResourceAssembler.ToCommandFromResource(resource);
         var result = await passwordRecoveryCommandService.Handle(command, cancellationToken);
