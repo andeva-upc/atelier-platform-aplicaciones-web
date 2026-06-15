@@ -8,4 +8,5 @@ namespace atelier_platform_aplicaciones_web.Core.Application.QueryServices;
 public interface IOwnerQueryService
 {
     Task<Owner?> Handle(GetOwnerByIdQuery query, CancellationToken cancellationToken = default);
+    Task<Owner?> Handle(GetOwnerByUserIdQuery query, CancellationToken cancellationToken = default);
 }

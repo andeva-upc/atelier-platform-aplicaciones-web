@@ -8,4 +8,5 @@ namespace atelier_platform_aplicaciones_web.Core.Application.QueryServices;
 public interface IEmployeeQueryService
 {
     Task<Employee?> Handle(GetEmployeeByIdQuery query, CancellationToken cancellationToken = default);
+    Task<Employee?> Handle(GetEmployeeByUserIdQuery query, CancellationToken cancellationToken = default);
 }
