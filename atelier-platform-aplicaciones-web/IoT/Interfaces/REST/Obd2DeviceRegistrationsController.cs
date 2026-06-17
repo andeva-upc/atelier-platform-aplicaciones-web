@@ -1,7 +1,10 @@
+using System;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
 using atelier_platform_aplicaciones_web.IoT.Application.CommandServices;
+using atelier_platform_aplicaciones_web.IoT.Domain.Model.Commands;
+using atelier_platform_aplicaciones_web.IoT.Domain.Model.ValueObjects;
 using atelier_platform_aplicaciones_web.IoT.Interfaces.REST.Resources;
 using atelier_platform_aplicaciones_web.IoT.Interfaces.REST.Transform;
 using atelier_platform_aplicaciones_web.IoT.Resources;
@@ -29,6 +32,21 @@ public class Obd2DeviceRegistrationsController(
         var result = await registrationCommandService.Handle(command, cancellationToken);
 
         return ActionResultFromIoTCommandResultAssembler.ToCreatedActionResult(
+            result,
+            Obd2DeviceRegistrationResourceFromEntityAssembler.ToResourceFromEntity,
+            this,
+            localizer
+        );
+    }
+
+    [HttpPost("{id}/deactivate")]
+    [SwaggerOperation(Summary = "Deactivate an OBD2 device registration", Description = "Deactivates an active registration, unlinking the OBD2 device and marking it available")]
+    public async Task<ActionResult> DeactivateObd2DeviceRegistration(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new DeactivateObd2DeviceRegistrationCommand(new Obd2DeviceRegistrationId(id));
+        var result = await registrationCommandService.Handle(command, cancellationToken);
+
+        return ActionResultFromIoTCommandResultAssembler.ToOkActionResult(
             result,
             Obd2DeviceRegistrationResourceFromEntityAssembler.ToResourceFromEntity,
             this,

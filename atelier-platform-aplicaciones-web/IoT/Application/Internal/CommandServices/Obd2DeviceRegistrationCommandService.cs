@@ -58,4 +58,38 @@ public class Obd2DeviceRegistrationCommandService(
 
         return Result<Obd2DeviceRegistration>.Success(registration);
     }
+
+    public async Task<Result<Obd2DeviceRegistration>> Handle(DeactivateObd2DeviceRegistrationCommand command, CancellationToken cancellationToken = default)
+    {
+        // 1. Validar existencia de la vinculación
+        var registration = await obd2DeviceRegistrationRepository.FindByIdAsync(command.RegistrationId.Value, cancellationToken);
+        if (registration == null)
+        {
+            return Result<Obd2DeviceRegistration>.Failure(IoTError.Obd2DeviceRegistrationNotFound, "iot.error.obd2DeviceRegistration.notFound");
+        }
+
+        // 2. Validar que no esté ya deactivada
+        if (registration.Status == Obd2RegistrationStatus.Inactive)
+        {
+            return Result<Obd2DeviceRegistration>.Failure(IoTError.Obd2DeviceRegistrationNotFound, "iot.error.obd2DeviceRegistration.alreadyInactive");
+        }
+
+        // 3. Desvincular en el registro (cambia estado a Inactive y asigna deletedAt)
+        registration.Deactivate();
+        obd2DeviceRegistrationRepository.Update(registration);
+
+        // 4. Buscar el dispositivo OBD2 asociado
+        var obd2Device = await obd2DeviceRepository.FindObd2DeviceByIdAsync(registration.Obd2DeviceId, cancellationToken);
+        if (obd2Device != null)
+        {
+            // 5. Cambiar el estado del OBD2 a AVAILABLE (Unlink)
+            obd2Device.Unlink();
+            obd2DeviceRepository.Update(obd2Device);
+        }
+
+        // 6. Completar transacción
+        await unitOfWork.CompleteAsync(cancellationToken);
+
+        return Result<Obd2DeviceRegistration>.Success(registration);
+    }
 }

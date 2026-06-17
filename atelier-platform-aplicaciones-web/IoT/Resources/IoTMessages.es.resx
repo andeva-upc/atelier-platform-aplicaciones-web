@@ -13,4 +13,6 @@
   <data name="iot.error.obd2Device.cannotDeleteLinkedDevice"><value>No se puede eliminar un dispositivo OBD2 enlazado.</value></data>
   <data name="iot.error.obd2DeviceRegistration.deviceAlreadyLinked"><value>Este dispositivo OBD2 ya se encuentra vinculado a un vehículo.</value></data>
   <data name="iot.error.obd2DeviceRegistration.vehicleAlreadyLinked"><value>Este vehículo ya se encuentra vinculado a un dispositivo OBD2 activo.</value></data>
+  <data name="iot.error.obd2DeviceRegistration.notFound"><value>La vinculación del dispositivo OBD2 no fue encontrada.</value></data>
+  <data name="iot.error.obd2DeviceRegistration.alreadyInactive"><value>La vinculación del dispositivo OBD2 ya está inactiva.</value></data>
 </root>

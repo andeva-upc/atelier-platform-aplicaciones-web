@@ -9,4 +9,5 @@ namespace atelier_platform_aplicaciones_web.IoT.Application.CommandServices;
 public interface IObd2DeviceRegistrationCommandService
 {
     Task<Result<Obd2DeviceRegistration>> Handle(LinkObd2DeviceToVehicleCommand command, CancellationToken cancellationToken = default);
+    Task<Result<Obd2DeviceRegistration>> Handle(DeactivateObd2DeviceRegistrationCommand command, CancellationToken cancellationToken = default);
 }
