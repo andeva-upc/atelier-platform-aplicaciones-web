@@ -10,4 +10,5 @@ public interface IObd2DeviceQueryService
 {
     Task<Obd2Device?> Handle(GetObd2DeviceByIdQuery query, CancellationToken cancellationToken = default);
     Task<IEnumerable<Obd2Device>> Handle(GetObd2DevicesByBranchIdQuery query, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Obd2Device>> Handle(GetAvailableObd2DevicesByBranchIdQuery query, CancellationToken cancellationToken = default);
 }

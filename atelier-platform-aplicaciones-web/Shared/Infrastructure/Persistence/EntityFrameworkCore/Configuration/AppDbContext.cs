@@ -9,6 +9,7 @@ using atelier_platform_aplicaciones_web.Inventory.Infrastructure.Persistence.Ent
 using atelier_platform_aplicaciones_web.Inventory.Domain.Model.Aggregates;
 using atelier_platform_aplicaciones_web.IoT.Infrastructure.Persistence.EntityFrameworkCore.Configuration.Extensions;
 using atelier_platform_aplicaciones_web.IoT.Domain.Model.Aggregates;
+using atelier_platform_aplicaciones_web.IoT.Domain.Model.Entities;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -24,6 +25,11 @@ public class AppDbContext(DbContextOptions options, AuditableEntityInterceptor a
     public DbSet<Product> Products { get; set; }
     public DbSet<Obd2Device> Obd2Devices { get; set; }
     public DbSet<Obd2DeviceRegistration> Obd2DeviceRegistrations { get; set; }
+    public DbSet<Vehicle> Vehicles { get; set; }
+    public DbSet<VehicleRegistration> VehicleRegistrations { get; set; }
+    public DbSet<CustomerRegistration> CustomerRegistrations { get; set; }
+    public DbSet<TelemetrySnapshot> TelemetrySnapshots { get; set; }
+    public DbSet<DtcAlert> DtcAlerts { get; set; }
 
     /// <inheritdoc />
     protected override void OnConfiguring(DbContextOptionsBuilder builder)

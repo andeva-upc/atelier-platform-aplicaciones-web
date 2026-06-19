@@ -73,6 +73,19 @@ public static class ActionResultFromIoTCommandResultAssembler
         return MapFailureToActionResult(result.Error, result.Message, controller, localizer);
     }
 
+    public static ActionResult ToNoContentActionResult<TEntity>(
+        Result<TEntity> result,
+        ControllerBase controller,
+        IStringLocalizer<IoTMessages> localizer)
+    {
+        if (result.IsSuccess)
+        {
+            return controller.NoContent();
+        }
+
+        return MapFailureToActionResult(result.Error, result.Message, controller, localizer);
+    }
+
     private static ActionResult MapFailureToActionResult(
         Enum? error,
         string message,

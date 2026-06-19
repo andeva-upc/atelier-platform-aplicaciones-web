@@ -98,4 +98,15 @@ public class Obd2DevicesController(
         var resources = devices.Select(Obd2DeviceResourceFromEntityAssembler.ToResourceFromEntity);
         return Ok(resources);
     }
+
+    [HttpGet("available")]
+    [SwaggerOperation(Summary = "Get available OBD2 devices", Description = "Retrieves all physical OBD2 devices that are available in a branch")]
+    public async Task<ActionResult> GetAvailableObd2Devices([FromQuery] Guid branchId, CancellationToken cancellationToken)
+    {
+        var query = new GetAvailableObd2DevicesByBranchIdQuery(new atelier_platform_aplicaciones_web.Shared.Domain.Model.ValueObjects.BranchId(branchId));
+        var devices = await obd2DeviceQueryService.Handle(query, cancellationToken);
+
+        var resources = devices.Select(Obd2DeviceResourceFromEntityAssembler.ToResourceFromEntity);
+        return Ok(resources);
+    }
 }
