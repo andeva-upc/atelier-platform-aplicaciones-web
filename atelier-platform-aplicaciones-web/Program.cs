@@ -221,6 +221,13 @@ builder.Services.AddScoped<IObd2DeviceCommandService, Obd2DeviceCommandService>(
 builder.Services.AddScoped<IObd2DeviceQueryService, Obd2DeviceQueryService>();
 builder.Services.AddScoped<IObd2DeviceRegistrationRepository, Obd2DeviceRegistrationRepository>();
 builder.Services.AddScoped<IObd2DeviceRegistrationCommandService, Obd2DeviceRegistrationCommandService>();
+builder.Services.AddScoped<IObd2DeviceRegistrationQueryService, Obd2DeviceRegistrationQueryService>();
+builder.Services.AddScoped<IVehicleRepository, VehicleRepository>();
+builder.Services.AddScoped<IVehicleRegistrationRepository, VehicleRegistrationRepository>();
+builder.Services.AddScoped<ITelemetrySnapshotRepository, TelemetrySnapshotRepository>();
+builder.Services.AddScoped<IDtcAlertRepository, DtcAlertRepository>();
+builder.Services.AddScoped<IVehicleCommandService, VehicleCommandService>();
+builder.Services.AddScoped<IVehicleQueryService, VehicleQueryService>();
 
 builder.Services.AddHttpClient<atelier_platform_aplicaciones_web.Billing.Application.OutboundServices.IFacthubService, 
     atelier_platform_aplicaciones_web.Billing.Infrastructure.ExternalServices.Facthub.FacthubService>(client => 

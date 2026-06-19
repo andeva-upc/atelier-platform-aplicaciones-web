@@ -11,4 +11,5 @@ public interface IObd2DeviceRegistrationRepository : IBaseRepository<Obd2DeviceR
 {
     Task<Obd2DeviceRegistration?> FindActiveByObd2DeviceIdAsync(Obd2DeviceId obd2DeviceId, CancellationToken cancellationToken = default);
     Task<Obd2DeviceRegistration?> FindActiveByVehicleIdAsync(VehicleId vehicleId, CancellationToken cancellationToken = default);
+    Task<IEnumerable<Obd2DeviceRegistration>> ListByBranchIdAndStatusAsync(BranchId branchId, Obd2RegistrationStatus status, CancellationToken cancellationToken = default);
 }

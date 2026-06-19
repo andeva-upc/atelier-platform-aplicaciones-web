@@ -19,4 +19,9 @@ public class Obd2DeviceQueryService(IObd2DeviceRepository obd2DeviceRepository) 
     {
         return await obd2DeviceRepository.FindAllByBranchIdAsync(query.BranchId, cancellationToken);
     }
+
+    public async Task<IEnumerable<Obd2Device>> Handle(GetAvailableObd2DevicesByBranchIdQuery query, CancellationToken cancellationToken = default)
+    {
+        return await obd2DeviceRepository.FindAvailableByBranchIdAsync(query.BranchId, cancellationToken);
+    }
 }

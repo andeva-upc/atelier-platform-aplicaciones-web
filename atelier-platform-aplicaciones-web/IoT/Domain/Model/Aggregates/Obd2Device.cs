@@ -5,7 +5,7 @@ using atelier_platform_aplicaciones_web.Shared.Domain.Model.ValueObjects;
 
 namespace atelier_platform_aplicaciones_web.IoT.Domain.Model.Aggregates;
 
-public class Obd2Device : IUserAuditableEntity
+public class Obd2Device : IAuditableEntity
 {
     public Obd2Device()
     {
@@ -36,8 +36,6 @@ public class Obd2Device : IUserAuditableEntity
 
     public DateTimeOffset? CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
-    public Guid? CreatedBy { get; set; }
-    public Guid? UpdatedBy { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
     public long Version { get; set; }
 

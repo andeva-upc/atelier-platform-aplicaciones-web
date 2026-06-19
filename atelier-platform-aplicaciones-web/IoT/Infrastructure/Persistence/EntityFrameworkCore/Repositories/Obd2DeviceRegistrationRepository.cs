@@ -23,4 +23,11 @@ public class Obd2DeviceRegistrationRepository(AppDbContext context) : BaseReposi
         return await Context.Set<Obd2DeviceRegistration>()
             .FirstOrDefaultAsync(r => r.VehicleId == vehicleId && r.Status == Obd2RegistrationStatus.Active, cancellationToken);
     }
+
+    public async Task<IEnumerable<Obd2DeviceRegistration>> ListByBranchIdAndStatusAsync(BranchId branchId, Obd2RegistrationStatus status, CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<Obd2DeviceRegistration>()
+            .Where(r => r.BranchId == branchId && r.Status == status)
+            .ToListAsync(cancellationToken);
+    }
 }
