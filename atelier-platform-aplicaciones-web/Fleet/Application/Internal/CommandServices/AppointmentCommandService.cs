@@ -12,7 +12,8 @@ namespace atelier_platform_aplicaciones_web.Fleet.Application.Internal.CommandSe
 
 public class AppointmentCommandService(
     IAppointmentRepository appointmentRepository,
-    IUnitOfWork unitOfWork) : IAppointmentCommandService
+    IUnitOfWork unitOfWork,
+    Microsoft.Extensions.Localization.IStringLocalizer<atelier_platform_aplicaciones_web.Fleet.Resources.FleetMessages> localizer) : IAppointmentCommandService
 {
     public async Task<Result<Appointment>> Handle(CreateAppointmentCommand command, CancellationToken cancellationToken = default)
     {
@@ -29,7 +30,7 @@ public class AppointmentCommandService(
             {
                 return Result<Appointment>.Failure(
                     AppointmentError.Overlap,
-                    "fleet.error.appointment.overlap");
+                    localizer["fleet.error.appointment.overlap"]);
             }
 
             var appointment = new Appointment(
@@ -48,13 +49,13 @@ public class AppointmentCommandService(
         {
             return Result<Appointment>.Failure(
                 AppointmentError.InvalidNotes,
-                e.Message);
+                localizer[e.Message]);
         }
         catch (Exception)
         {
             return Result<Appointment>.Failure(
                 AppointmentError.Unexpected,
-                "fleet.error.appointment.unexpected");
+                localizer["fleet.error.appointment.unexpected"]);
         }
     }
 
@@ -69,7 +70,7 @@ public class AppointmentCommandService(
             {
                 return Result<Appointment>.Failure(
                     AppointmentError.NotFound,
-                    "fleet.error.appointment.notFound");
+                    localizer["fleet.error.appointment.notFound"]);
             }
 
             var scheduledEnd = command.ScheduledStart.AddHours(1);
@@ -84,7 +85,7 @@ public class AppointmentCommandService(
             {
                 return Result<Appointment>.Failure(
                     AppointmentError.Overlap,
-                    "fleet.error.appointment.overlap");
+                    localizer["fleet.error.appointment.overlap"]);
             }
 
             appointment.Update(
@@ -103,19 +104,19 @@ public class AppointmentCommandService(
         {
             return Result<Appointment>.Failure(
                 AppointmentError.InvalidNotes,
-                e.Message);
+                localizer[e.Message]);
         }
         catch (InvalidOperationException e)
         {
             return Result<Appointment>.Failure(
                 AppointmentError.CannotUpdateFinalStatus,
-                e.Message);
+                localizer[e.Message]);
         }
         catch (Exception)
         {
             return Result<Appointment>.Failure(
                 AppointmentError.Unexpected,
-                "fleet.error.appointment.unexpected");
+                localizer["fleet.error.appointment.unexpected"]);
         }
     }
 
@@ -131,7 +132,7 @@ public class AppointmentCommandService(
             {
                 return Result<Appointment>.Failure(
                     AppointmentError.NotFound,
-                    "fleet.error.appointment.notFound");
+                    localizer["fleet.error.appointment.notFound"]);
             }
 
             appointment.Cancel();
@@ -145,13 +146,13 @@ public class AppointmentCommandService(
         {
             return Result<Appointment>.Failure(
                 AppointmentError.CannotCancelCompleted,
-                e.Message);
+                localizer[e.Message]);
         }
         catch (Exception)
         {
             return Result<Appointment>.Failure(
                 AppointmentError.Unexpected,
-                "fleet.error.appointment.unexpected");
+                localizer["fleet.error.appointment.unexpected"]);
         }
     }
 
@@ -167,7 +168,7 @@ public class AppointmentCommandService(
             {
                 return Result<Appointment>.Failure(
                     AppointmentError.NotFound,
-                    "fleet.error.appointment.notFound");
+                    localizer["fleet.error.appointment.notFound"]);
             }
 
             appointment.Complete();
@@ -181,13 +182,13 @@ public class AppointmentCommandService(
         {
             return Result<Appointment>.Failure(
                 AppointmentError.CannotCompleteCanceled,
-                e.Message);
+                localizer[e.Message]);
         }
         catch (Exception)
         {
             return Result<Appointment>.Failure(
                 AppointmentError.Unexpected,
-                "fleet.error.appointment.unexpected");
+                localizer["fleet.error.appointment.unexpected"]);
         }
     }
 }

@@ -243,9 +243,14 @@ builder.Services.AddScoped<IAppointmentCommandService, AppointmentCommandService
 builder.Services.AddScoped<IAppointmentQueryService, AppointmentQueryService>();
 
 // Customer Registration Dependencies
-builder.Services.AddScoped<ICustomerRegistrationRepository, CustomerRegistrationRepository>();
-builder.Services.AddScoped<ICustomerRegistrationCommandService, CustomerRegistrationCommandService>();
-builder.Services.AddScoped<ICustomerRegistrationQueryService, CustomerRegistrationQueryService>();
+builder.Services.AddScoped<atelier_platform_aplicaciones_web.Fleet.Domain.Repositories.ICustomerRegistrationRepository, atelier_platform_aplicaciones_web.Fleet.Infrastructure.Persistence.EntityFrameworkCore.Repositories.CustomerRegistrationRepository>();
+builder.Services.AddScoped<atelier_platform_aplicaciones_web.Fleet.Application.CommandServices.ICustomerRegistrationCommandService, atelier_platform_aplicaciones_web.Fleet.Application.Internal.CommandServices.CustomerRegistrationCommandService>();
+builder.Services.AddScoped<atelier_platform_aplicaciones_web.Fleet.Application.QueryServices.ICustomerRegistrationQueryService, atelier_platform_aplicaciones_web.Fleet.Application.Internal.QueryServices.CustomerRegistrationQueryService>();
+
+// Employee Registration Dependencies
+builder.Services.AddScoped<atelier_platform_aplicaciones_web.Fleet.Domain.Repositories.IEmployeeRegistrationRepository, atelier_platform_aplicaciones_web.Fleet.Infrastructure.Persistence.EntityFrameworkCore.Repositories.EmployeeRegistrationRepository>();
+builder.Services.AddScoped<atelier_platform_aplicaciones_web.Fleet.Application.CommandServices.IEmployeeRegistrationCommandService, atelier_platform_aplicaciones_web.Fleet.Application.Internal.CommandServices.EmployeeRegistrationCommandService>();
+builder.Services.AddScoped<atelier_platform_aplicaciones_web.Fleet.Application.QueryServices.IEmployeeRegistrationQueryService, atelier_platform_aplicaciones_web.Fleet.Application.Internal.QueryServices.EmployeeRegistrationQueryService>();
 
 builder.Services.AddHttpClient<atelier_platform_aplicaciones_web.Billing.Application.OutboundServices.IFacthubService, 
     atelier_platform_aplicaciones_web.Billing.Infrastructure.ExternalServices.Facthub.FacthubService>(client => 
