@@ -60,11 +60,11 @@ public class QuotesController : ControllerBase
     /// </summary>
     /// <param name="quoteId">The unique identifier of the quote.</param>
     /// <returns>The Quote resource if found; otherwise, 404 Not Found.</returns>
-    [HttpGet("{quoteId}")]
+    [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Get a quote by ID", Description = "Retrieves the details of a specific quote")]
-    public async Task<IActionResult> GetQuoteById(Guid quoteId)
+    public async Task<IActionResult> GetQuoteById(Guid id)
     {
-        var getQuoteByIdQuery = new Billing.Domain.Model.Queries.GetQuoteByIdQuery(quoteId);
+        var getQuoteByIdQuery = new Billing.Domain.Model.Queries.GetQuoteByIdQuery(id);
         var quote = await _quoteQueryService.Handle(getQuoteByIdQuery);
 
         if (quote == null)
@@ -79,9 +79,9 @@ public class QuotesController : ControllerBase
     /// </summary>
     /// <param name="branchId">The branch identifier.</param>
     /// <returns>A list of Quote resources for the given branch.</returns>
-    [HttpGet("branch/{branchId}")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get quotes by branch ID", Description = "Retrieves all quotes associated with a specific branch")]
-    public async Task<IActionResult> GetQuotesByBranchId(Guid branchId)
+    public async Task<IActionResult> GetQuotesByBranchId([FromQuery] Guid branchId)
     {
         var getQuotesByBranchIdQuery = new Billing.Domain.Model.Queries.GetQuotesByBranchIdQuery(branchId);
         var quotes = await _quoteQueryService.Handle(getQuotesByBranchIdQuery);
@@ -96,12 +96,12 @@ public class QuotesController : ControllerBase
     /// <param name="quoteId">The ID of the quote to update.</param>
     /// <param name="resource">The updated subtotal and discount values.</param>
     /// <returns>The updated Quote resource.</returns>
-    [HttpPut("{quoteId}")]
+    [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Update quote details", Description = "Updates the subtotal and discount percentage of an existing quote")]
-    public async Task<IActionResult> UpdateQuote(Guid quoteId, [FromBody] UpdateQuoteResource resource)
+    public async Task<IActionResult> UpdateQuote(Guid id, [FromBody] UpdateQuoteResource resource)
     {
         var updateQuoteCommand = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.UpdateQuoteCommand(
-            quoteId,
+            id,
             resource.SubtotalAmount,
             resource.DiscountPercentage
         );
@@ -122,11 +122,11 @@ public class QuotesController : ControllerBase
     /// </summary>
     /// <param name="quoteId">The ID of the quote to approve.</param>
     /// <returns>The approved Quote resource.</returns>
-    [HttpPost("{quoteId}/approve")]
+    [HttpPost("{id}/approvals")]
     [SwaggerOperation(Summary = "Approve a quote", Description = "Changes the status of a draft quote to APPROVED")]
-    public async Task<IActionResult> ApproveQuote(Guid quoteId)
+    public async Task<IActionResult> ApproveQuote(Guid id)
     {
-        var approveQuoteCommand = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.ApproveQuoteCommand(quoteId);
+        var approveQuoteCommand = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.ApproveQuoteCommand(id);
         var result = await _quoteCommandService.Handle(approveQuoteCommand);
 
         if (result.IsSuccess)
@@ -143,11 +143,11 @@ public class QuotesController : ControllerBase
     /// </summary>
     /// <param name="quoteId">The ID of the quote to cancel.</param>
     /// <returns>The cancelled Quote resource.</returns>
-    [HttpPost("{quoteId}/cancel")]
+    [HttpPost("{id}/cancellations")]
     [SwaggerOperation(Summary = "Cancel a quote", Description = "Changes the status of a quote to CANCELLED")]
-    public async Task<IActionResult> CancelQuote(Guid quoteId)
+    public async Task<IActionResult> CancelQuote(Guid id)
     {
-        var cancelQuoteCommand = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.CancelQuoteCommand(quoteId);
+        var cancelQuoteCommand = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.CancelQuoteCommand(id);
         var result = await _quoteCommandService.Handle(cancelQuoteCommand);
 
         if (result.IsSuccess)
