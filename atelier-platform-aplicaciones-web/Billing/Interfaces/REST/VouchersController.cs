@@ -111,7 +111,24 @@ public class VouchersController : ControllerBase
         return ActionResultFromBillingCommandResultAssembler.MapFailureToActionResult(result.Error, result.Message, this, _localizer);
     }
 
+    /// <summary>
+    ///     Removes a mistakenly registered payment from a voucher.
+    /// </summary>
+    /// <param name="voucherId">The ID of the voucher.</param>
+    /// <param name="paymentId">The ID of the payment to remove.</param>
+    /// <returns>A success message.</returns>
+    [HttpDelete("{voucherId}/payments/{paymentId}")]
+    [SwaggerOperation(Summary = "Remove a payment from a voucher", Description = "Removes a payment registered by mistake")]
+    public async Task<IActionResult> DeletePayment(System.Guid voucherId, System.Guid paymentId)
+    {
+        var command = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.RemovePaymentCommand(voucherId, paymentId);
+        var result = await _voucherCommandService.Handle(command);
 
+        if (result.IsSuccess)
+        {
+            return Ok(new { message = "Payment removed successfully" });
+        }
 
-
+        return ActionResultFromBillingCommandResultAssembler.MapFailureToActionResult(result.Error, result.Message, this, _localizer);
+    }
 }

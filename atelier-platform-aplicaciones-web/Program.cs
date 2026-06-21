@@ -222,7 +222,6 @@ builder.Services.AddScoped<IVoucherRepository, VoucherRepository>();
 builder.Services.AddScoped<IVoucherCommandService, VoucherCommandService>();
 builder.Services.AddScoped<IVoucherQueryService, VoucherQueryService>();
 
-builder.Services.AddScoped<atelier_platform_aplicaciones_web.Billing.Application.CommandServices.ICheckoutCommandService, atelier_platform_aplicaciones_web.Billing.Application.Internal.CommandServices.CheckoutCommandService>();
 
 // IoT Dependencies
 builder.Services.AddScoped<IObd2DeviceRepository, Obd2DeviceRepository>();

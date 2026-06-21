@@ -32,8 +32,13 @@ public interface IVoucherCommandService
     /// </summary>
     /// <param name="command">The remove payment command.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
+    /// <summary>
+    ///     Removes a payment from a voucher.
+    /// </summary>
+    /// <param name="command">The remove payment command.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>A successful Result or an error if payment/voucher is not found.</returns>
-
+    Task<Result> Handle(RemovePaymentCommand command, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Processes a complete checkout (Generates voucher and registers total payment immediately).
