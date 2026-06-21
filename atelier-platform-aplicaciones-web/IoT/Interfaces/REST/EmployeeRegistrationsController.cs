@@ -46,13 +46,13 @@ public class EmployeeRegistrationsController(
             EmployeeRegistrationResourceFromEntityAssembler.ToResourceFromEntity(result.Value!));
     }
 
-    [HttpGet("{registrationId}")]
+    [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Get an employee registration by ID")]
     public async Task<ActionResult> GetEmployeeRegistrationById(
-        Guid registrationId,
+        Guid id,
         CancellationToken cancellationToken)
     {
-        var query = new GetEmployeeRegistrationByIdQuery(registrationId);
+        var query = new GetEmployeeRegistrationByIdQuery(id);
 
         var registration = await employeeRegistrationQueryService.Handle(query, cancellationToken);
 
@@ -118,15 +118,15 @@ public class EmployeeRegistrationsController(
         });
     }
 
-    [HttpPut("{registrationId}")]
+    [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Update an employee registration")]
     public async Task<ActionResult> UpdateEmployeeRegistration(
-        Guid registrationId,
+        Guid id,
         [FromBody] UpdateEmployeeRegistrationResource resource,
         CancellationToken cancellationToken)
     {
         var command = UpdateEmployeeRegistrationCommandFromResourceAssembler
-            .ToCommandFromResource(registrationId, resource);
+            .ToCommandFromResource(id, resource);
 
         var result = await employeeRegistrationCommandService.Handle(command, cancellationToken);
 
@@ -139,13 +139,13 @@ public class EmployeeRegistrationsController(
             .ToResourceFromEntity(result.Value!));
     }
 
-    [HttpDelete("{registrationId}")]
+    [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Deactivate an employee registration")]
     public async Task<ActionResult> DeactivateEmployeeRegistration(
-        Guid registrationId,
+        Guid id,
         CancellationToken cancellationToken)
     {
-        var command = new DeactivateEmployeeRegistrationCommand(registrationId);
+        var command = new DeactivateEmployeeRegistrationCommand(id);
 
         var result = await employeeRegistrationCommandService.Handle(command, cancellationToken);
 
@@ -154,7 +154,8 @@ public class EmployeeRegistrationsController(
             return ToFailureResponse(result);
         }
 
-        return NoContent();
+        return Ok(EmployeeRegistrationResourceFromEntityAssembler
+            .ToResourceFromEntity(result.Value!));
     }
 
 
