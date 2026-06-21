@@ -56,11 +56,11 @@ public class VouchersController : ControllerBase
     /// </summary>
     /// <param name="id">The unique identifier of the voucher.</param>
     /// <returns>The Voucher resource if found; otherwise, 404 Not Found.</returns>
-    [HttpGet("{id}")]
+    [HttpGet("{voucherId}")]
     [SwaggerOperation(Summary = "Get voucher by id", Description = "Gets a voucher by its identifier")]
-    public async Task<IActionResult> GetVoucherById(System.Guid id)
+    public async Task<IActionResult> GetVoucherById(System.Guid voucherId)
     {
-        var query = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Queries.GetVoucherByIdQuery(id);
+        var query = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Queries.GetVoucherByIdQuery(voucherId);
         var voucher = await _voucherQueryService.Handle(query);
 
         if (voucher == null)
@@ -127,37 +127,6 @@ public class VouchersController : ControllerBase
         if (result.IsSuccess)
         {
             return Ok(new { message = "Payment removed successfully" });
-        }
-
-        return ActionResultFromBillingCommandResultAssembler.MapFailureToActionResult(result.Error, result.Message, this, _localizer);
-    }
-
-    /// <summary>
-    ///     Processes a complete checkout workflow in a single step:
-    ///     Validates the quote, issues the Facthub invoice, generates the voucher, 
-    ///     and registers full payment automatically.
-    /// </summary>
-    /// <param name="resource">The checkout details.</param>
-    /// <returns>The fully paid and generated Voucher resource.</returns>
-    [HttpPost("checkout")]
-    [SwaggerOperation(Summary = "Process complete checkout", Description = "Generates a voucher and registers the total payment immediately")]
-    public async Task<IActionResult> ProcessCheckout([FromBody] ProcessCheckoutResource resource)
-    {
-        var command = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.ProcessCheckoutCommand(
-            resource.QuoteId,
-            resource.Type,
-            resource.CustomerDocumentType,
-            resource.CustomerDocumentNumber,
-            resource.CustomerName,
-            resource.Method
-        );
-
-        var result = await _voucherCommandService.Handle(command);
-
-        if (result.IsSuccess)
-        {
-            var voucherResource = VoucherResourceFromEntityAssembler.ToResourceFromEntity(result.Value!);
-            return CreatedAtAction(nameof(GetVoucherById), new { id = voucherResource.Id }, voucherResource);
         }
 
         return ActionResultFromBillingCommandResultAssembler.MapFailureToActionResult(result.Error, result.Message, this, _localizer);

@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "api-design-patterns": {
+      "source": "asyrafhussin/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/api-design-patterns/SKILL.md",
+      "computedHash": "4c9048d7644cb28fcef996d042f9a8a4b6d5bd1131f40f720592b0247f1b928d"
+    }
+  }
+}
