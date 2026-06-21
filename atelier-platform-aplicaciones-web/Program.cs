@@ -59,6 +59,13 @@ using atelier_platform_aplicaciones_web.Shared.Infrastructure.Mediator.Cortex.Co
 using Cortex.Mediator.Commands;
 using Cortex.Mediator.DependencyInjection;
 
+using atelier_platform_aplicaciones_web.Fleet.Domain.Repositories;
+using atelier_platform_aplicaciones_web.Fleet.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using atelier_platform_aplicaciones_web.Fleet.Application.CommandServices;
+using atelier_platform_aplicaciones_web.Fleet.Application.QueryServices;
+using atelier_platform_aplicaciones_web.Fleet.Application.Internal.CommandServices;
+using atelier_platform_aplicaciones_web.Fleet.Application.Internal.QueryServices;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -228,6 +235,11 @@ builder.Services.AddScoped<ITelemetrySnapshotRepository, TelemetrySnapshotReposi
 builder.Services.AddScoped<IDtcAlertRepository, DtcAlertRepository>();
 builder.Services.AddScoped<IVehicleCommandService, VehicleCommandService>();
 builder.Services.AddScoped<IVehicleQueryService, VehicleQueryService>();
+
+// Fleet Dependencies
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IAppointmentCommandService, AppointmentCommandService>();
+builder.Services.AddScoped<IAppointmentQueryService, AppointmentQueryService>();
 
 builder.Services.AddHttpClient<atelier_platform_aplicaciones_web.Billing.Application.OutboundServices.IFacthubService, 
     atelier_platform_aplicaciones_web.Billing.Infrastructure.ExternalServices.Facthub.FacthubService>(client => 

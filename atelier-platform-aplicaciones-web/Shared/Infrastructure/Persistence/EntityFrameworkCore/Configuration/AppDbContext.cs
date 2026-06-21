@@ -10,6 +10,8 @@ using atelier_platform_aplicaciones_web.Inventory.Domain.Model.Aggregates;
 using atelier_platform_aplicaciones_web.IoT.Infrastructure.Persistence.EntityFrameworkCore.Configuration.Extensions;
 using atelier_platform_aplicaciones_web.IoT.Domain.Model.Aggregates;
 using atelier_platform_aplicaciones_web.IoT.Domain.Model.Entities;
+using atelier_platform_aplicaciones_web.Fleet.Domain.Model.Aggregates;
+using atelier_platform_aplicaciones_web.Fleet.Infrastructure.Persistence.EntityFrameworkCore.Configuration.Extensions;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +32,7 @@ public class AppDbContext(DbContextOptions options, AuditableEntityInterceptor a
     public DbSet<CustomerRegistration> CustomerRegistrations { get; set; }
     public DbSet<TelemetrySnapshot> TelemetrySnapshots { get; set; }
     public DbSet<DtcAlert> DtcAlerts { get; set; }
-
+    public DbSet<Appointment> Appointments { get; set; }
     /// <inheritdoc />
     protected override void OnConfiguring(DbContextOptionsBuilder builder)
     {
@@ -62,7 +64,10 @@ public class AppDbContext(DbContextOptions options, AuditableEntityInterceptor a
 
         // Apply IoT Bounded Context Configuration
         builder.ApplyIotConfiguration();
-        
+
+        // Apply Fleet Bounded Context Configuration
+        builder.ApplyFleetConfiguration();
+
         builder.UseSnakeCaseNamingConvention();
         
         foreach (var entityType in builder.Model.GetEntityTypes())
