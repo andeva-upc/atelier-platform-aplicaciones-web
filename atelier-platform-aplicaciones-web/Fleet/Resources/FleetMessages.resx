@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+
+  <data name="fleet.error.appointment.overlap"><value>The appointment overlaps with an existing one.</value></data>
+  <data name="fleet.error.appointment.unexpected"><value>An unexpected error occurred while processing the appointment.</value></data>
+  <data name="fleet.error.appointment.notFound"><value>Appointment not found.</value></data>
+  <data name="fleet.error.customer.notFound"><value>Customer registration not found.</value></data>
+  <data name="fleet.error.employee.notFound"><value>Employee registration not found.</value></data>
+</root>

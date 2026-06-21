@@ -7,12 +7,15 @@ using atelier_platform_aplicaciones_web.Fleet.Domain.Model.ValueObjects;
 using atelier_platform_aplicaciones_web.Fleet.Domain.Repositories;
 using atelier_platform_aplicaciones_web.Shared.Application.Model;
 using atelier_platform_aplicaciones_web.Shared.Domain.Repositories;
+using Microsoft.Extensions.Localization;
+using atelier_platform_aplicaciones_web.Fleet.Resources;
 
 namespace atelier_platform_aplicaciones_web.Fleet.Application.Internal.CommandServices;
 
 public class EmployeeRegistrationCommandService(
     IEmployeeRegistrationRepository employeeRegistrationRepository,
-    IUnitOfWork unitOfWork) : IEmployeeRegistrationCommandService
+    IUnitOfWork unitOfWork,
+    IStringLocalizer<FleetMessages> localizer) : IEmployeeRegistrationCommandService
 {
     public async Task<Result<EmployeeRegistration>> Handle(CreateEmployeeRegistrationCommand command, CancellationToken cancellationToken = default)
     {
@@ -35,7 +38,7 @@ public class EmployeeRegistrationCommandService(
 
         if (registration == null)
         {
-            return Result<EmployeeRegistration>.Failure(atelier_platform_aplicaciones_web.Fleet.Application.Errors.RegistrationError.NotFound, "Employee Registration not found.");
+            return Result<EmployeeRegistration>.Failure(atelier_platform_aplicaciones_web.Fleet.Application.Errors.RegistrationError.NotFound, localizer["fleet.error.employee.notFound"]);
         }
 
         registration.Update(command.Speciality, command.SpecialityName, command.Salary);
@@ -52,7 +55,7 @@ public class EmployeeRegistrationCommandService(
 
         if (registration == null)
         {
-            return Result<EmployeeRegistration>.Failure(atelier_platform_aplicaciones_web.Fleet.Application.Errors.RegistrationError.NotFound, "Employee Registration not found.");
+            return Result<EmployeeRegistration>.Failure(atelier_platform_aplicaciones_web.Fleet.Application.Errors.RegistrationError.NotFound, localizer["fleet.error.employee.notFound"]);
         }
 
         registration.Deactivate();
