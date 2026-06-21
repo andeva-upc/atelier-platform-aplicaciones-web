@@ -15,6 +15,11 @@ public interface IEmployeeRegistrationRepository : IBaseRepository<EmployeeRegis
         BranchId branchId,
         CancellationToken cancellationToken = default);
 
+    Task<IEnumerable<EmployeeRegistration>> FindAllByBranchIdAndStatusAsync(
+        BranchId branchId,
+        string status,
+        CancellationToken cancellationToken = default);
+
     Task<bool> ExistsByEmployeeIdAndBranchIdAsync(
         EmployeeId employeeId,
         BranchId branchId,

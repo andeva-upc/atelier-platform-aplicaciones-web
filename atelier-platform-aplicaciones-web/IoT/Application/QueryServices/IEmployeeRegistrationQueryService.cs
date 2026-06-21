@@ -16,4 +16,8 @@ public interface IEmployeeRegistrationQueryService
     Task<IEnumerable<EmployeeRegistration>> Handle(
         GetEmployeeRegistrationsByBranchIdQuery query,
         CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<EmployeeRegistration>> Handle(
+        GetEmployeeRegistrationsByBranchIdAndStatusQuery query,
+        CancellationToken cancellationToken = default);
 }

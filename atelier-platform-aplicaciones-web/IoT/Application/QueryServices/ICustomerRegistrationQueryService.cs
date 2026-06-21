@@ -16,4 +16,8 @@ public interface ICustomerRegistrationQueryService
     Task<IEnumerable<CustomerRegistration>> Handle(
         GetCustomerRegistrationsByBranchIdQuery query,
         CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<CustomerRegistration>> Handle(
+        GetCustomerRegistrationsByBranchIdAndStatusQuery query,
+        CancellationToken cancellationToken = default);
 }

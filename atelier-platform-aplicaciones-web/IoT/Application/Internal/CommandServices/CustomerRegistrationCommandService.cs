@@ -44,7 +44,45 @@ public class CustomerRegistrationCommandService(
         catch (ArgumentException e)
         {
             return Result<CustomerRegistration>.Failure(
+                CustomerRegistrationError.InvalidData,
+                e.Message);
+        }
+        catch (Exception)
+        {
+            return Result<CustomerRegistration>.Failure(
                 CustomerRegistrationError.Unexpected,
+                "iot.error.customerRegistration.unexpected");
+        }
+    }
+
+    public async Task<Result<CustomerRegistration>> Handle(
+        UpdateCustomerRegistrationCommand command,
+        CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            var registration = await customerRegistrationRepository.FindByIdAsync(
+                command.RegistrationId,
+                cancellationToken);
+
+            if (registration == null)
+            {
+                return Result<CustomerRegistration>.Failure(
+                    CustomerRegistrationError.NotFound,
+                    "iot.error.customerRegistration.notFound");
+            }
+
+            registration.UpdateStatus(command.Status);
+
+            customerRegistrationRepository.Update(registration);
+            await unitOfWork.CompleteAsync(cancellationToken);
+
+            return Result<CustomerRegistration>.Success(registration);
+        }
+        catch (ArgumentException e)
+        {
+            return Result<CustomerRegistration>.Failure(
+                CustomerRegistrationError.InvalidData,
                 e.Message);
         }
         catch (Exception)

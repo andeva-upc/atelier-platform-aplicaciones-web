@@ -18,4 +18,9 @@ public interface ICustomerRegistrationRepository : IBaseRepository<CustomerRegis
         CustomerId customerId,
         BranchId branchId,
         CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<CustomerRegistration>> FindAllByBranchIdAndStatusAsync(
+        BranchId branchId,
+        string status,
+        CancellationToken cancellationToken = default);
 }

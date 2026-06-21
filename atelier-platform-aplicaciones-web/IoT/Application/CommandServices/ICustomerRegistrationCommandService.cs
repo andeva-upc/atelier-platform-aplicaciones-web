@@ -11,6 +11,10 @@ public interface ICustomerRegistrationCommandService
         CancellationToken cancellationToken = default);
 
     Task<Result<CustomerRegistration>> Handle(
+        UpdateCustomerRegistrationCommand command,
+        CancellationToken cancellationToken = default);
+
+    Task<Result<CustomerRegistration>> Handle(
         DeactivateCustomerRegistrationCommand command,
         CancellationToken cancellationToken = default);
 }

@@ -34,4 +34,14 @@ public class CustomerRegistrationQueryService(
             query.BranchId,
             cancellationToken);
     }
+
+    public async Task<IEnumerable<CustomerRegistration>> Handle(
+        GetCustomerRegistrationsByBranchIdAndStatusQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        return await customerRegistrationRepository.FindAllByBranchIdAndStatusAsync(
+            query.BranchId,
+            query.Status,
+            cancellationToken);
+    }
 }

@@ -4,5 +4,6 @@ public enum CustomerRegistrationError
 {
     NotFound,
     AlreadyExists,
+    InvalidData,
     Unexpected
 }

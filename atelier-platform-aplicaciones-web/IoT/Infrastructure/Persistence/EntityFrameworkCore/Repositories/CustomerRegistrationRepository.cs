@@ -48,6 +48,21 @@ public class CustomerRegistrationRepository(AppDbContext context)
                 cancellationToken);
     }
 
+    public async Task<IEnumerable<CustomerRegistration>> FindAllByBranchIdAndStatusAsync(
+        BranchId branchId,
+        string status,
+        CancellationToken cancellationToken = default)
+    {
+        var normalizedStatus = status.Trim().ToUpperInvariant();
+
+        return await Context.Set<CustomerRegistration>()
+            .Where(registration =>
+                registration.BranchId == branchId &&
+                registration.Status == normalizedStatus &&
+                registration.DeletedAt == null)
+            .ToListAsync(cancellationToken);
+    }
+
     void IBaseRepository<CustomerRegistration>.Remove(CustomerRegistration entity)
     {
         entity.Deactivate();

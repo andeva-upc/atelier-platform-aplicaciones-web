@@ -17,14 +17,14 @@ namespace atelier_platform_aplicaciones_web.IoT.Interfaces.REST;
 [ApiController]
 [Route("api/v1/customer-registrations")]
 [Produces(MediaTypeNames.Application.Json)]
-[Tags("Customer Registrations")]
+[Tags("CustomerRegistrations")]
 [Authorize]
 public class CustomerRegistrationsController(
     ICustomerRegistrationCommandService customerRegistrationCommandService,
     ICustomerRegistrationQueryService customerRegistrationQueryService) : ControllerBase
 {
     [HttpPost]
-    [SwaggerOperation(Summary = "Create a customer registration")]
+    [SwaggerOperation(Summary = "Create a new customer registration")]
     public async Task<ActionResult> CreateCustomerRegistration(
         [FromBody] CreateCustomerRegistrationResource resource,
         CancellationToken cancellationToken)
@@ -32,34 +32,29 @@ public class CustomerRegistrationsController(
         var command = CreateCustomerRegistrationCommandFromResourceAssembler
             .ToCommandFromResource(resource);
 
-        var result = await customerRegistrationCommandService.Handle(
-            command,
-            cancellationToken);
+        var result = await customerRegistrationCommandService.Handle(command, cancellationToken);
 
         if (result.IsFailure)
         {
             return ToFailureResponse(result);
         }
 
-        var registration = result.Value!;
-
-        return CreatedAtAction(
-            nameof(GetCustomerRegistrationById),
-            new { id = registration.Id },
-            CustomerRegistrationResourceFromEntityAssembler.ToResourceFromEntity(registration));
+        return StatusCode(
+            StatusCodes.Status201Created,
+            CustomerRegistrationResourceFromEntityAssembler.ToResourceFromEntity(result.Value!));
     }
 
-    [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Deactivate a customer registration")]
-    public async Task<ActionResult> DeactivateCustomerRegistration(
-        Guid id,
+    [HttpPut("{registrationId}")]
+    [SwaggerOperation(Summary = "Update a customer registration")]
+    public async Task<ActionResult> UpdateCustomerRegistration(
+        Guid registrationId,
+        [FromBody] UpdateCustomerRegistrationResource resource,
         CancellationToken cancellationToken)
     {
-        var command = new DeactivateCustomerRegistrationCommand(id);
+        var command = UpdateCustomerRegistrationCommandFromResourceAssembler
+            .ToCommandFromResource(registrationId, resource);
 
-        var result = await customerRegistrationCommandService.Handle(
-            command,
-            cancellationToken);
+        var result = await customerRegistrationCommandService.Handle(command, cancellationToken);
 
         if (result.IsFailure)
         {
@@ -70,18 +65,86 @@ public class CustomerRegistrationsController(
             .ToResourceFromEntity(result.Value!));
     }
 
-    [HttpGet("{id}")]
-    [ActionName(nameof(GetCustomerRegistrationById))]
+    [HttpDelete("{registrationId}")]
+    [SwaggerOperation(Summary = "Delete a customer registration")]
+    public async Task<ActionResult> DeleteCustomerRegistration(
+        Guid registrationId,
+        CancellationToken cancellationToken)
+    {
+        var command = new DeactivateCustomerRegistrationCommand(registrationId);
+
+        var result = await customerRegistrationCommandService.Handle(command, cancellationToken);
+
+        if (result.IsFailure)
+        {
+            return ToFailureResponse(result);
+        }
+
+        return NoContent();
+    }
+
+    [HttpGet]
+    [SwaggerOperation(Summary = "Get customer registrations")]
+    public async Task<ActionResult> GetCustomerRegistrations(
+        [FromQuery] Guid? branchId,
+        [FromQuery] string? status,
+        [FromQuery] Guid? customerId,
+        CancellationToken cancellationToken)
+    {
+        if (customerId.HasValue)
+        {
+            var query = new GetCustomerRegistrationByCustomerIdQuery(
+                new CustomerId(customerId.Value));
+
+            var registration = await customerRegistrationQueryService.Handle(query, cancellationToken);
+
+            if (registration == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(CustomerRegistrationResourceFromEntityAssembler
+                .ToResourceFromEntity(registration));
+        }
+
+        if (branchId.HasValue && !string.IsNullOrWhiteSpace(status))
+        {
+            var query = new GetCustomerRegistrationsByBranchIdAndStatusQuery(
+                new BranchId(branchId.Value),
+                status.Trim().ToUpperInvariant());
+
+            var registrations = await customerRegistrationQueryService.Handle(query, cancellationToken);
+
+            return Ok(registrations.Select(CustomerRegistrationResourceFromEntityAssembler
+                .ToResourceFromEntity));
+        }
+
+        if (branchId.HasValue)
+        {
+            var query = new GetCustomerRegistrationsByBranchIdQuery(
+                new BranchId(branchId.Value));
+
+            var registrations = await customerRegistrationQueryService.Handle(query, cancellationToken);
+
+            return Ok(registrations.Select(CustomerRegistrationResourceFromEntityAssembler
+                .ToResourceFromEntity));
+        }
+
+        return BadRequest(new
+        {
+            message = "iot.error.customerRegistration.invalidQueryParams"
+        });
+    }
+
+    [HttpGet("{registrationId}")]
     [SwaggerOperation(Summary = "Get customer registration by ID")]
     public async Task<ActionResult> GetCustomerRegistrationById(
-        Guid id,
+        Guid registrationId,
         CancellationToken cancellationToken)
     {
-        var query = new GetCustomerRegistrationByIdQuery(id);
+        var query = new GetCustomerRegistrationByIdQuery(registrationId);
 
-        var registration = await customerRegistrationQueryService.Handle(
-            query,
-            cancellationToken);
+        var registration = await customerRegistrationQueryService.Handle(query, cancellationToken);
 
         if (registration == null)
         {
@@ -90,45 +153,6 @@ public class CustomerRegistrationsController(
 
         return Ok(CustomerRegistrationResourceFromEntityAssembler
             .ToResourceFromEntity(registration));
-    }
-
-    [HttpGet("customer/{customerId}")]
-    [SwaggerOperation(Summary = "Get customer registration by customer ID")]
-    public async Task<ActionResult> GetCustomerRegistrationByCustomerId(
-        Guid customerId,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetCustomerRegistrationByCustomerIdQuery(
-            new CustomerId(customerId));
-
-        var registration = await customerRegistrationQueryService.Handle(
-            query,
-            cancellationToken);
-
-        if (registration == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(CustomerRegistrationResourceFromEntityAssembler
-            .ToResourceFromEntity(registration));
-    }
-
-    [HttpGet("branch/{branchId}")]
-    [SwaggerOperation(Summary = "Get customer registrations by branch ID")]
-    public async Task<ActionResult> GetCustomerRegistrationsByBranchId(
-        Guid branchId,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetCustomerRegistrationsByBranchIdQuery(
-            new BranchId(branchId));
-
-        var registrations = await customerRegistrationQueryService.Handle(
-            query,
-            cancellationToken);
-
-        return Ok(registrations.Select(CustomerRegistrationResourceFromEntityAssembler
-            .ToResourceFromEntity));
     }
 
     private ActionResult ToFailureResponse<T>(Result<T> result)
@@ -139,6 +163,7 @@ public class CustomerRegistrationsController(
             {
                 CustomerRegistrationError.NotFound => NotFound(new { message = result.Message }),
                 CustomerRegistrationError.AlreadyExists => Conflict(new { message = result.Message }),
+                CustomerRegistrationError.InvalidData => BadRequest(new { message = result.Message }),
                 _ => Problem(statusCode: 500, detail: result.Message)
             };
         }

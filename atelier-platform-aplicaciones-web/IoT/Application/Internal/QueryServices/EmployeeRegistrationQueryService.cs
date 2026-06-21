@@ -34,4 +34,14 @@ public class EmployeeRegistrationQueryService(
             query.BranchId,
             cancellationToken);
     }
+
+    public async Task<IEnumerable<EmployeeRegistration>> Handle(
+        GetEmployeeRegistrationsByBranchIdAndStatusQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        return await employeeRegistrationRepository.FindAllByBranchIdAndStatusAsync(
+            query.BranchId,
+            query.Status,
+            cancellationToken);
+    }
 }

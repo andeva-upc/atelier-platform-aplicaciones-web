@@ -30,7 +30,9 @@ public class AppointmentsController(
         [FromBody] CreateAppointmentResource resource,
         CancellationToken cancellationToken)
     {
-        var command = CreateAppointmentCommandFromResourceAssembler.ToCommandFromResource(resource);
+        var command = CreateAppointmentCommandFromResourceAssembler
+            .ToCommandFromResource(resource);
+
         var result = await appointmentCommandService.Handle(command, cancellationToken);
 
         if (result.IsFailure)
@@ -38,21 +40,21 @@ public class AppointmentsController(
             return ToFailureResponse(result);
         }
 
-        var appointment = result.Value!;
-        return CreatedAtAction(
-            nameof(GetAppointmentById),
-            new { id = appointment.Id.Value },
-            AppointmentResourceFromEntityAssembler.ToResourceFromEntity(appointment));
+        return StatusCode(
+            StatusCodes.Status201Created,
+            AppointmentResourceFromEntityAssembler.ToResourceFromEntity(result.Value!));
     }
 
-    [HttpPut("{id}")]
+    [HttpPut("{appointmentId}")]
     [SwaggerOperation(Summary = "Update an appointment")]
     public async Task<ActionResult> UpdateAppointment(
-        Guid id,
+        Guid appointmentId,
         [FromBody] UpdateAppointmentResource resource,
         CancellationToken cancellationToken)
     {
-        var command = UpdateAppointmentCommandFromResourceAssembler.ToCommandFromResource(id, resource);
+        var command = UpdateAppointmentCommandFromResourceAssembler
+            .ToCommandFromResource(appointmentId, resource);
+
         var result = await appointmentCommandService.Handle(command, cancellationToken);
 
         if (result.IsFailure)
@@ -60,14 +62,18 @@ public class AppointmentsController(
             return ToFailureResponse(result);
         }
 
-        return Ok(AppointmentResourceFromEntityAssembler.ToResourceFromEntity(result.Value!));
+        return Ok(AppointmentResourceFromEntityAssembler
+            .ToResourceFromEntity(result.Value!));
     }
 
-    [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Cancel an appointment")]
-    public async Task<ActionResult> DeleteAppointment(Guid id, CancellationToken cancellationToken)
+    [HttpDelete("{appointmentId}")]
+    [SwaggerOperation(Summary = "Delete an appointment")]
+    public async Task<ActionResult> DeleteAppointment(
+        Guid appointmentId,
+        CancellationToken cancellationToken)
     {
-        var command = new CancelAppointmentCommand(id);
+        var command = new CancelAppointmentCommand(appointmentId);
+
         var result = await appointmentCommandService.Handle(command, cancellationToken);
 
         if (result.IsFailure)
@@ -78,27 +84,71 @@ public class AppointmentsController(
         return NoContent();
     }
 
-    [HttpPost("{id}/complete")]
-    [SwaggerOperation(Summary = "Complete an appointment")]
-    public async Task<ActionResult> CompleteAppointment(Guid id, CancellationToken cancellationToken)
+    [HttpGet]
+    [SwaggerOperation(Summary = "Get appointments")]
+    public async Task<ActionResult> GetAppointments(
+        [FromQuery] Guid? branchId,
+        [FromQuery] string? status,
+        [FromQuery] Guid? customerId,
+        [FromQuery] Guid? vehicleId,
+        CancellationToken cancellationToken)
     {
-        var command = new CompleteAppointmentCommand(id);
-        var result = await appointmentCommandService.Handle(command, cancellationToken);
-
-        if (result.IsFailure)
+        if (branchId.HasValue && !string.IsNullOrWhiteSpace(status))
         {
-            return ToFailureResponse(result);
+            var query = new GetAppointmentsByBranchIdAndStatusQuery(
+                new BranchId(branchId.Value),
+                status.Trim().ToUpperInvariant());
+
+            var appointments = await appointmentQueryService.Handle(query, cancellationToken);
+
+            return Ok(appointments.Select(AppointmentResourceFromEntityAssembler
+                .ToResourceFromEntity));
         }
 
-        return Ok(AppointmentResourceFromEntityAssembler.ToResourceFromEntity(result.Value!));
+        if (branchId.HasValue)
+        {
+            var query = new GetAppointmentsByBranchIdQuery(new BranchId(branchId.Value));
+
+            var appointments = await appointmentQueryService.Handle(query, cancellationToken);
+
+            return Ok(appointments.Select(AppointmentResourceFromEntityAssembler
+                .ToResourceFromEntity));
+        }
+
+        if (customerId.HasValue)
+        {
+            var query = new GetAppointmentsByCustomerIdQuery(new CustomerId(customerId.Value));
+
+            var appointments = await appointmentQueryService.Handle(query, cancellationToken);
+
+            return Ok(appointments.Select(AppointmentResourceFromEntityAssembler
+                .ToResourceFromEntity));
+        }
+
+        if (vehicleId.HasValue)
+        {
+            var query = new GetAppointmentsByVehicleIdQuery(new VehicleId(vehicleId.Value));
+
+            var appointments = await appointmentQueryService.Handle(query, cancellationToken);
+
+            return Ok(appointments.Select(AppointmentResourceFromEntityAssembler
+                .ToResourceFromEntity));
+        }
+
+        return BadRequest(new
+        {
+            message = "fleet.error.appointment.invalidQueryParams"
+        });
     }
 
-    [HttpGet("{id}")]
-    [ActionName(nameof(GetAppointmentById))]
+    [HttpGet("{appointmentId}")]
     [SwaggerOperation(Summary = "Get appointment by ID")]
-    public async Task<ActionResult> GetAppointmentById(Guid id, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetAppointmentById(
+        Guid appointmentId,
+        CancellationToken cancellationToken)
     {
-        var query = new GetAppointmentByIdQuery(new AppointmentId(id));
+        var query = new GetAppointmentByIdQuery(new AppointmentId(appointmentId));
+
         var appointment = await appointmentQueryService.Handle(query, cancellationToken);
 
         if (appointment == null)
@@ -106,50 +156,8 @@ public class AppointmentsController(
             return NotFound();
         }
 
-        return Ok(AppointmentResourceFromEntityAssembler.ToResourceFromEntity(appointment));
-    }
-
-    [HttpGet("branch/{branchId}")]
-    [SwaggerOperation(Summary = "Get appointments by branch ID")]
-    public async Task<ActionResult> GetAppointmentsByBranchId(Guid branchId, CancellationToken cancellationToken)
-    {
-        var query = new GetAppointmentsByBranchIdQuery(new BranchId(branchId));
-        var appointments = await appointmentQueryService.Handle(query, cancellationToken);
-
-        return Ok(appointments.Select(AppointmentResourceFromEntityAssembler.ToResourceFromEntity));
-    }
-
-    [HttpGet("branch/{branchId}/status/{status}")]
-    [SwaggerOperation(Summary = "Get appointments by branch ID and status")]
-    public async Task<ActionResult> GetAppointmentsByBranchIdAndStatus(
-        Guid branchId,
-        string status,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetAppointmentsByBranchIdAndStatusQuery(new BranchId(branchId), status);
-        var appointments = await appointmentQueryService.Handle(query, cancellationToken);
-
-        return Ok(appointments.Select(AppointmentResourceFromEntityAssembler.ToResourceFromEntity));
-    }
-
-    [HttpGet("customer/{customerId}")]
-    [SwaggerOperation(Summary = "Get appointments by customer ID")]
-    public async Task<ActionResult> GetAppointmentsByCustomerId(Guid customerId, CancellationToken cancellationToken)
-    {
-        var query = new GetAppointmentsByCustomerIdQuery(new CustomerId(customerId));
-        var appointments = await appointmentQueryService.Handle(query, cancellationToken);
-
-        return Ok(appointments.Select(AppointmentResourceFromEntityAssembler.ToResourceFromEntity));
-    }
-
-    [HttpGet("vehicle/{vehicleId}")]
-    [SwaggerOperation(Summary = "Get appointments by vehicle ID")]
-    public async Task<ActionResult> GetAppointmentsByVehicleId(Guid vehicleId, CancellationToken cancellationToken)
-    {
-        var query = new GetAppointmentsByVehicleIdQuery(new VehicleId(vehicleId));
-        var appointments = await appointmentQueryService.Handle(query, cancellationToken);
-
-        return Ok(appointments.Select(AppointmentResourceFromEntityAssembler.ToResourceFromEntity));
+        return Ok(AppointmentResourceFromEntityAssembler
+            .ToResourceFromEntity(appointment));
     }
 
     private ActionResult ToFailureResponse<T>(Result<T> result)
@@ -161,9 +169,9 @@ public class AppointmentsController(
                 AppointmentError.NotFound => NotFound(new { message = result.Message }),
                 AppointmentError.Overlap => Conflict(new { message = result.Message }),
                 AppointmentError.InvalidNotes => BadRequest(new { message = result.Message }),
-                AppointmentError.CannotUpdateFinalStatus => BadRequest(new { message = result.Message }),
-                AppointmentError.CannotCancelCompleted => BadRequest(new { message = result.Message }),
-                AppointmentError.CannotCompleteCanceled => BadRequest(new { message = result.Message }),
+                AppointmentError.CannotUpdateFinalStatus => Conflict(new { message = result.Message }),
+                AppointmentError.CannotCancelCompleted => Conflict(new { message = result.Message }),
+                AppointmentError.CannotCompleteCanceled => Conflict(new { message = result.Message }),
                 _ => Problem(statusCode: 500, detail: result.Message)
             };
         }

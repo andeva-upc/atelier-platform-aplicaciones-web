@@ -11,6 +11,7 @@ using atelier_platform_aplicaciones_web.IoT.Interfaces.REST.Transform;
 using atelier_platform_aplicaciones_web.Shared.Application.Model;
 using atelier_platform_aplicaciones_web.Shared.Domain.Model.ValueObjects;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace atelier_platform_aplicaciones_web.IoT.Interfaces.REST;
@@ -18,14 +19,14 @@ namespace atelier_platform_aplicaciones_web.IoT.Interfaces.REST;
 [ApiController]
 [Route("api/v1/employee-registrations")]
 [Produces(MediaTypeNames.Application.Json)]
-[Tags("Employee Registrations")]
+[Tags("EmployeeRegistrations")]
 [Authorize]
 public class EmployeeRegistrationsController(
     IEmployeeRegistrationCommandService employeeRegistrationCommandService,
     IEmployeeRegistrationQueryService employeeRegistrationQueryService) : ControllerBase
 {
     [HttpPost]
-    [SwaggerOperation(Summary = "Create an employee registration")]
+    [SwaggerOperation(Summary = "Create a new employee registration")]
     public async Task<ActionResult> CreateEmployeeRegistration(
         [FromBody] CreateEmployeeRegistrationResource resource,
         CancellationToken cancellationToken)
@@ -40,23 +41,92 @@ public class EmployeeRegistrationsController(
             return ToFailureResponse(result);
         }
 
-        var registration = result.Value!;
-
-        return CreatedAtAction(
-            nameof(GetEmployeeRegistrationById),
-            new { id = registration.Id },
-            EmployeeRegistrationResourceFromEntityAssembler.ToResourceFromEntity(registration));
+        return StatusCode(
+            StatusCodes.Status201Created,
+            EmployeeRegistrationResourceFromEntityAssembler.ToResourceFromEntity(result.Value!));
     }
 
-    [HttpPut("{id}")]
+    [HttpGet("{registrationId}")]
+    [SwaggerOperation(Summary = "Get an employee registration by ID")]
+    public async Task<ActionResult> GetEmployeeRegistrationById(
+        Guid registrationId,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetEmployeeRegistrationByIdQuery(registrationId);
+
+        var registration = await employeeRegistrationQueryService.Handle(query, cancellationToken);
+
+        if (registration == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(EmployeeRegistrationResourceFromEntityAssembler
+            .ToResourceFromEntity(registration));
+    }
+
+    [HttpGet]
+    [SwaggerOperation(Summary = "Get employee registrations")]
+    public async Task<ActionResult> GetEmployeeRegistrations(
+        [FromQuery] Guid? branchId,
+        [FromQuery] string? status,
+        [FromQuery] Guid? employeeId,
+        CancellationToken cancellationToken)
+    {
+        if (employeeId.HasValue)
+        {
+            var query = new GetEmployeeRegistrationByEmployeeIdQuery(
+                new EmployeeId(employeeId.Value));
+
+            var registration = await employeeRegistrationQueryService.Handle(query, cancellationToken);
+
+            if (registration == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(EmployeeRegistrationResourceFromEntityAssembler
+                .ToResourceFromEntity(registration));
+        }
+
+        if (branchId.HasValue && !string.IsNullOrWhiteSpace(status))
+        {
+            var query = new GetEmployeeRegistrationsByBranchIdAndStatusQuery(
+                new BranchId(branchId.Value),
+                status.Trim().ToUpperInvariant());
+
+            var registrations = await employeeRegistrationQueryService.Handle(query, cancellationToken);
+
+            return Ok(registrations.Select(EmployeeRegistrationResourceFromEntityAssembler
+                .ToResourceFromEntity));
+        }
+
+        if (branchId.HasValue)
+        {
+            var query = new GetEmployeeRegistrationsByBranchIdQuery(
+                new BranchId(branchId.Value));
+
+            var registrations = await employeeRegistrationQueryService.Handle(query, cancellationToken);
+
+            return Ok(registrations.Select(EmployeeRegistrationResourceFromEntityAssembler
+                .ToResourceFromEntity));
+        }
+
+        return BadRequest(new
+        {
+            message = "iot.error.employeeRegistration.invalidQueryParams"
+        });
+    }
+
+    [HttpPut("{registrationId}")]
     [SwaggerOperation(Summary = "Update an employee registration")]
     public async Task<ActionResult> UpdateEmployeeRegistration(
-        Guid id,
+        Guid registrationId,
         [FromBody] UpdateEmployeeRegistrationResource resource,
         CancellationToken cancellationToken)
     {
         var command = UpdateEmployeeRegistrationCommandFromResourceAssembler
-            .ToCommandFromResource(id, resource);
+            .ToCommandFromResource(registrationId, resource);
 
         var result = await employeeRegistrationCommandService.Handle(command, cancellationToken);
 
@@ -69,13 +139,13 @@ public class EmployeeRegistrationsController(
             .ToResourceFromEntity(result.Value!));
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{registrationId}")]
     [SwaggerOperation(Summary = "Deactivate an employee registration")]
     public async Task<ActionResult> DeactivateEmployeeRegistration(
-        Guid id,
+        Guid registrationId,
         CancellationToken cancellationToken)
     {
-        var command = new DeactivateEmployeeRegistrationCommand(id);
+        var command = new DeactivateEmployeeRegistrationCommand(registrationId);
 
         var result = await employeeRegistrationCommandService.Handle(command, cancellationToken);
 
@@ -84,62 +154,9 @@ public class EmployeeRegistrationsController(
             return ToFailureResponse(result);
         }
 
-        return Ok(EmployeeRegistrationResourceFromEntityAssembler
-            .ToResourceFromEntity(result.Value!));
+        return NoContent();
     }
 
-    [HttpGet("{id}")]
-    [ActionName(nameof(GetEmployeeRegistrationById))]
-    [SwaggerOperation(Summary = "Get employee registration by ID")]
-    public async Task<ActionResult> GetEmployeeRegistrationById(
-        Guid id,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetEmployeeRegistrationByIdQuery(id);
-
-        var registration = await employeeRegistrationQueryService.Handle(query, cancellationToken);
-
-        if (registration == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(EmployeeRegistrationResourceFromEntityAssembler
-            .ToResourceFromEntity(registration));
-    }
-
-    [HttpGet("employee/{employeeId}")]
-    [SwaggerOperation(Summary = "Get employee registration by employee ID")]
-    public async Task<ActionResult> GetEmployeeRegistrationByEmployeeId(
-        Guid employeeId,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetEmployeeRegistrationByEmployeeIdQuery(new EmployeeId(employeeId));
-
-        var registration = await employeeRegistrationQueryService.Handle(query, cancellationToken);
-
-        if (registration == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(EmployeeRegistrationResourceFromEntityAssembler
-            .ToResourceFromEntity(registration));
-    }
-
-    [HttpGet("branch/{branchId}")]
-    [SwaggerOperation(Summary = "Get employee registrations by branch ID")]
-    public async Task<ActionResult> GetEmployeeRegistrationsByBranchId(
-        Guid branchId,
-        CancellationToken cancellationToken)
-    {
-        var query = new GetEmployeeRegistrationsByBranchIdQuery(new BranchId(branchId));
-
-        var registrations = await employeeRegistrationQueryService.Handle(query, cancellationToken);
-
-        return Ok(registrations.Select(EmployeeRegistrationResourceFromEntityAssembler
-            .ToResourceFromEntity));
-    }
 
     private ActionResult ToFailureResponse<T>(Result<T> result)
     {
