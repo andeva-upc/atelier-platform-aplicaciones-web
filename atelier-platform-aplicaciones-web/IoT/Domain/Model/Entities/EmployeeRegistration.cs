@@ -38,6 +38,7 @@ public class EmployeeRegistration
         Salary = Math.Round(salary, 2, MidpointRounding.AwayFromZero);
         Status = "ACTIVE";
         CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public Guid Id { get; private set; }
@@ -48,6 +49,7 @@ public class EmployeeRegistration
     public decimal Salary { get; private set; }
     public string Status { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public DateTime UpdatedAt { get; private set; }
     public DateTime? DeletedAt { get; private set; }
 
     public void Update(
@@ -67,17 +69,20 @@ public class EmployeeRegistration
         Speciality = speciality.Trim();
         SpecialityName = specialityName.Trim();
         Salary = Math.Round(salary, 2, MidpointRounding.AwayFromZero);
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void Activate()
     {
         Status = "ACTIVE";
         DeletedAt = null;
+        UpdatedAt = DateTime.UtcNow;
     }
 
     public void Deactivate()
     {
         Status = "INACTIVE";
         DeletedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;
     }
 }

@@ -3,6 +3,7 @@ using atelier_platform_aplicaciones_web.IoT.Domain.Model.Aggregates;
 using atelier_platform_aplicaciones_web.IoT.Domain.Model.Entities;
 using atelier_platform_aplicaciones_web.IoT.Domain.Model.ValueObjects;
 using atelier_platform_aplicaciones_web.Shared.Domain.Model.ValueObjects;
+using CoreEmployeeId = atelier_platform_aplicaciones_web.Core.Domain.Model.ValueObjects.EmployeeId;
 using Microsoft.EntityFrameworkCore;
 
 namespace atelier_platform_aplicaciones_web.IoT.Infrastructure.Persistence.EntityFrameworkCore.Configuration.Extensions;
@@ -17,6 +18,7 @@ public static class ModelBuilderExtensions
         builder.Entity<Vehicle>().HasQueryFilter(v => v.DeletedAt == null);
         builder.Entity<VehicleRegistration>().HasQueryFilter(vr => vr.DeletedAt == null);
         builder.Entity<CustomerRegistration>().HasQueryFilter(cr => cr.DeletedAt == null);
+        builder.Entity<EmployeeRegistration>().HasQueryFilter(er => er.DeletedAt == null);
 
         // Obd2Device mapping
         builder.Entity<Obd2Device>(entity =>
@@ -188,6 +190,52 @@ public static class ModelBuilderExtensions
             entity.Property(e => e.DeletedAt);
 
             entity.HasIndex(e => e.CustomerId);
+            entity.HasIndex(e => e.BranchId);
+        });
+
+        // EmployeeRegistration mapping
+        builder.Entity<EmployeeRegistration>(entity =>
+        {
+            entity.ToTable("employee_registrations");
+
+            entity.HasKey(e => e.Id);
+
+            entity.Property(e => e.Id)
+                .IsRequired();
+
+            entity.Property(e => e.EmployeeId)
+                .HasConversion(v => v.Value, v => new CoreEmployeeId(v))
+                .IsRequired();
+
+            entity.Property(e => e.BranchId)
+                .HasConversion(v => v.Value, v => new BranchId(v))
+                .IsRequired();
+
+            entity.Property(e => e.Speciality)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.SpecialityName)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            entity.Property(e => e.Salary)
+                .HasColumnType("decimal(10,2)")
+                .IsRequired();
+
+            entity.Property(e => e.Status)
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.Property(e => e.CreatedAt)
+                .IsRequired();
+
+            entity.Property(e => e.UpdatedAt)
+                .IsRequired();
+
+            entity.Property(e => e.DeletedAt);
+
+            entity.HasIndex(e => e.EmployeeId);
             entity.HasIndex(e => e.BranchId);
         });
 
