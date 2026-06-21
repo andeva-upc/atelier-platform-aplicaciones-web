@@ -1,0 +1,5 @@
+using System;
+
+namespace atelier_platform_aplicaciones_web.Fleet.Domain.Model.Queries;
+
+public record GetCustomerRegistrationByIdQuery(Guid Id);
