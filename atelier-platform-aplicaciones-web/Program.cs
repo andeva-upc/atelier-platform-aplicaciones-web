@@ -18,12 +18,12 @@ using atelier_platform_aplicaciones_web.Inventory.Application.Internal.QueryServ
 
 using atelier_platform_aplicaciones_web.Core.Domain.Repositories;
 using atelier_platform_aplicaciones_web.Core.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
-using atelier_platform_aplicaciones_web.IoT.Domain.Repositories;
-using atelier_platform_aplicaciones_web.IoT.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
 using atelier_platform_aplicaciones_web.IoT.Application.CommandServices;
 using atelier_platform_aplicaciones_web.IoT.Application.Internal.CommandServices;
-using atelier_platform_aplicaciones_web.IoT.Application.QueryServices;
 using atelier_platform_aplicaciones_web.IoT.Application.Internal.QueryServices;
+using atelier_platform_aplicaciones_web.IoT.Application.QueryServices;
+using atelier_platform_aplicaciones_web.IoT.Domain.Repositories;
+using atelier_platform_aplicaciones_web.IoT.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
 
 using atelier_platform_aplicaciones_web.Billing.Domain.Repositories;
 using atelier_platform_aplicaciones_web.Billing.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
@@ -58,6 +58,13 @@ using atelier_platform_aplicaciones_web.IAM.Infrastructure.Pipeline.Middleware.E
 using atelier_platform_aplicaciones_web.Shared.Infrastructure.Mediator.Cortex.Configuration;
 using Cortex.Mediator.Commands;
 using Cortex.Mediator.DependencyInjection;
+
+using atelier_platform_aplicaciones_web.Fleet.Domain.Repositories;
+using atelier_platform_aplicaciones_web.Fleet.Infrastructure.Persistence.EntityFrameworkCore.Repositories;
+using atelier_platform_aplicaciones_web.Fleet.Application.CommandServices;
+using atelier_platform_aplicaciones_web.Fleet.Application.QueryServices;
+using atelier_platform_aplicaciones_web.Fleet.Application.Internal.CommandServices;
+using atelier_platform_aplicaciones_web.Fleet.Application.Internal.QueryServices;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Localization;
@@ -228,6 +235,16 @@ builder.Services.AddScoped<ITelemetrySnapshotRepository, TelemetrySnapshotReposi
 builder.Services.AddScoped<IDtcAlertRepository, DtcAlertRepository>();
 builder.Services.AddScoped<IVehicleCommandService, VehicleCommandService>();
 builder.Services.AddScoped<IVehicleQueryService, VehicleQueryService>();
+
+// Fleet Dependencies
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
+builder.Services.AddScoped<IAppointmentCommandService, AppointmentCommandService>();
+builder.Services.AddScoped<IAppointmentQueryService, AppointmentQueryService>();
+
+// Customer Registration Dependencies
+builder.Services.AddScoped<ICustomerRegistrationRepository, CustomerRegistrationRepository>();
+builder.Services.AddScoped<ICustomerRegistrationCommandService, CustomerRegistrationCommandService>();
+builder.Services.AddScoped<ICustomerRegistrationQueryService, CustomerRegistrationQueryService>();
 
 builder.Services.AddHttpClient<atelier_platform_aplicaciones_web.Billing.Application.OutboundServices.IFacthubService, 
     atelier_platform_aplicaciones_web.Billing.Infrastructure.ExternalServices.Facthub.FacthubService>(client => 
