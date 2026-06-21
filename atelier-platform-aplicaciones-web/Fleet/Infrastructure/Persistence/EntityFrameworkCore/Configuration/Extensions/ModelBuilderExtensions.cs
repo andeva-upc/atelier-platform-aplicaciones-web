@@ -65,5 +65,45 @@ public static class ModelBuilderExtensions
             entity.HasIndex(a => a.CustomerId);
             entity.HasIndex(a => a.VehicleId);
         });
+
+        builder.Entity<CustomerRegistration>().HasQueryFilter(c => c.DeletedAt == null);
+        builder.Entity<CustomerRegistration>(entity =>
+        {
+            entity.ToTable("customer_registrations");
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Id)
+                .HasConversion(v => v.Value, v => new CustomerRegistrationId(v))
+                .IsRequired();
+            
+            entity.Property(c => c.Status)
+                .HasConversion(
+                    status => status.ToString(),
+                    value => Enum.Parse<CustomerRegistrationStatus>(value))
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.HasIndex(c => c.BranchId);
+            entity.HasIndex(c => c.CustomerId);
+        });
+
+        builder.Entity<EmployeeRegistration>().HasQueryFilter(e => e.DeletedAt == null);
+        builder.Entity<EmployeeRegistration>(entity =>
+        {
+            entity.ToTable("employee_registrations");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id)
+                .HasConversion(v => v.Value, v => new EmployeeRegistrationId(v))
+                .IsRequired();
+
+            entity.Property(e => e.Status)
+                .HasConversion(
+                    status => status.ToString(),
+                    value => Enum.Parse<EmployeeRegistrationStatus>(value))
+                .IsRequired()
+                .HasMaxLength(20);
+
+            entity.HasIndex(e => e.BranchId);
+            entity.HasIndex(e => e.EmployeeId);
+        });
     }
 }
