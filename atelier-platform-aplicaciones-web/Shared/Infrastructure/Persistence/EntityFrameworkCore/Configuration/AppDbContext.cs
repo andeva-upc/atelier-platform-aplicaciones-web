@@ -29,7 +29,8 @@ public class AppDbContext(DbContextOptions options, AuditableEntityInterceptor a
     public DbSet<Obd2DeviceRegistration> Obd2DeviceRegistrations { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<VehicleRegistration> VehicleRegistrations { get; set; }
-    public DbSet<CustomerRegistration> CustomerRegistrations { get; set; }
+    public DbSet<Fleet.Domain.Model.Aggregates.CustomerRegistration> CustomerRegistrations { get; set; }
+    public DbSet<Fleet.Domain.Model.Aggregates.EmployeeRegistration> EmployeeRegistrations { get; set; }
     public DbSet<TelemetrySnapshot> TelemetrySnapshots { get; set; }
     public DbSet<DtcAlert> DtcAlerts { get; set; }
     public DbSet<Appointment> Appointments { get; set; }

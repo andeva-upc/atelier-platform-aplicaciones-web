@@ -31,11 +31,11 @@ public class EmployeeRegistrationCommandService(
 
     public async Task<Result<EmployeeRegistration>> Handle(UpdateEmployeeRegistrationCommand command, CancellationToken cancellationToken = default)
     {
-        var registration = await employeeRegistrationRepository.FindByIdAsync(new EmployeeRegistrationId(command.Id));
+        var registration = await employeeRegistrationRepository.FindByIdAsync(command.Id);
 
         if (registration == null)
         {
-            return Result<EmployeeRegistration>.Failure("Employee Registration not found.");
+            return Result<EmployeeRegistration>.Failure(atelier_platform_aplicaciones_web.Fleet.Application.Errors.RegistrationError.NotFound, "Employee Registration not found.");
         }
 
         registration.Update(command.Speciality, command.SpecialityName, command.Salary);
@@ -48,11 +48,11 @@ public class EmployeeRegistrationCommandService(
 
     public async Task<Result<EmployeeRegistration>> Handle(DeactivateEmployeeRegistrationCommand command, CancellationToken cancellationToken = default)
     {
-        var registration = await employeeRegistrationRepository.FindByIdAsync(new EmployeeRegistrationId(command.Id));
+        var registration = await employeeRegistrationRepository.FindByIdAsync(command.Id);
 
         if (registration == null)
         {
-            return Result<EmployeeRegistration>.Failure("Employee Registration not found.");
+            return Result<EmployeeRegistration>.Failure(atelier_platform_aplicaciones_web.Fleet.Application.Errors.RegistrationError.NotFound, "Employee Registration not found.");
         }
 
         registration.Deactivate();

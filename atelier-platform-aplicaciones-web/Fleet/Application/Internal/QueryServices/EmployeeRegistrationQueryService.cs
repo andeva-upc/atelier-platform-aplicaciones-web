@@ -16,20 +16,20 @@ public class EmployeeRegistrationQueryService(
 {
     public async Task<EmployeeRegistration?> Handle(GetEmployeeRegistrationByIdQuery query, CancellationToken cancellationToken = default)
     {
-        return await employeeRegistrationRepository.FindByIdAsync(new EmployeeRegistrationId(query.Id));
+        return await employeeRegistrationRepository.FindByIdAsync(query.Id);
     }
 
     public async Task<IEnumerable<EmployeeRegistration>> Handle(GetEmployeeRegistrationsByBranchIdQuery query, CancellationToken cancellationToken = default)
     {
-        var queryable = employeeRegistrationRepository.Query();
+        var all = await employeeRegistrationRepository.ListAsync(cancellationToken);
         
-        queryable = queryable.Where(e => e.BranchId == query.BranchId);
+        var filtered = all.Where(e => e.BranchId == query.BranchId);
         
         if (query.EmployeeId.HasValue)
         {
-            queryable = queryable.Where(e => e.EmployeeId == query.EmployeeId.Value);
+            filtered = filtered.Where(e => e.EmployeeId == query.EmployeeId.Value);
         }
 
-        return await queryable.ToListAsync(cancellationToken);
+        return filtered.ToList();
     }
 }

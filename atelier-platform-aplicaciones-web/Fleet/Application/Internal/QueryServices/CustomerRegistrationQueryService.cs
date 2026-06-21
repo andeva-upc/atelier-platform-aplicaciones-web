@@ -16,20 +16,20 @@ public class CustomerRegistrationQueryService(
 {
     public async Task<CustomerRegistration?> Handle(GetCustomerRegistrationByIdQuery query, CancellationToken cancellationToken = default)
     {
-        return await customerRegistrationRepository.FindByIdAsync(new CustomerRegistrationId(query.Id));
+        return await customerRegistrationRepository.FindByIdAsync(query.Id);
     }
 
     public async Task<IEnumerable<CustomerRegistration>> Handle(GetCustomerRegistrationsByBranchIdQuery query, CancellationToken cancellationToken = default)
     {
-        var queryable = customerRegistrationRepository.Query();
+        var all = await customerRegistrationRepository.ListAsync(cancellationToken);
         
-        queryable = queryable.Where(c => c.BranchId == query.BranchId);
+        var filtered = all.Where(c => c.BranchId == query.BranchId);
         
         if (query.CustomerId.HasValue)
         {
-            queryable = queryable.Where(c => c.CustomerId == query.CustomerId.Value);
+            filtered = filtered.Where(c => c.CustomerId == query.CustomerId.Value);
         }
 
-        return await queryable.ToListAsync(cancellationToken);
+        return filtered.ToList();
     }
 }

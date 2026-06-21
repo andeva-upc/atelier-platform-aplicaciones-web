@@ -26,11 +26,11 @@ public class CustomerRegistrationCommandService(
 
     public async Task<Result<CustomerRegistration>> Handle(DeactivateCustomerRegistrationCommand command, CancellationToken cancellationToken = default)
     {
-        var registration = await customerRegistrationRepository.FindByIdAsync(new CustomerRegistrationId(command.Id));
+        var registration = await customerRegistrationRepository.FindByIdAsync(command.Id);
 
         if (registration == null)
         {
-            return Result<CustomerRegistration>.Failure("Customer Registration not found.");
+            return Result<CustomerRegistration>.Failure(atelier_platform_aplicaciones_web.Fleet.Application.Errors.RegistrationError.NotFound, "Customer Registration not found.");
         }
 
         registration.Deactivate();
