@@ -154,28 +154,7 @@ public class VoucherCommandService : IVoucherCommandService
         }
     }
 
-    public async Task<Result> Handle(RemovePaymentCommand command, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            var voucher = await _voucherRepository.FindByIdWithPaymentsAsync(command.VoucherId);
-            if (voucher == null) return Result.Failure(BillingErrorCodes.VoucherNotFound, _localizer["billing.error.voucher.notFound"]);
 
-            voucher.RemovePayment(command.PaymentId);
-            
-            _voucherRepository.Update(voucher);
-            await _unitOfWork.CompleteAsync();
-
-            return Result.Success();
-        }
-        catch (Exception ex)
-        {
-            if (ex.Message == "Payment not found.")
-                return Result.Failure(BillingErrorCodes.PaymentNotFound, _localizer["billing.error.payment.notFound"]);
-
-            return Result.Failure(BillingErrorCodes.InternalError, _localizer["billing.error.internal"]);
-        }
-    }
 
     public async Task<Result<Voucher>> Handle(ProcessCheckoutCommand command, CancellationToken cancellationToken = default)
     {
