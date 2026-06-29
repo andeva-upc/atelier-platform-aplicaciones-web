@@ -18,7 +18,7 @@ public class VoucherQueryService : IVoucherQueryService
 
     public async Task<Voucher?> Handle(GetVoucherByIdQuery query, CancellationToken cancellationToken = default)
     {
-        return await _voucherRepository.FindByIdAsync(query.Id);
+        return await _voucherRepository.FindByIdWithPaymentsAsync(query.Id);
     }
 
     public async Task<System.Collections.Generic.IEnumerable<Voucher>> Handle(GetVouchersByBranchIdQuery query, CancellationToken cancellationToken = default)

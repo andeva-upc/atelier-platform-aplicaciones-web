@@ -9,6 +9,7 @@ using atelier_platform_aplicaciones_web.Billing.Domain.Repositories;
 using atelier_platform_aplicaciones_web.Shared.Domain.Repositories;
 using atelier_platform_aplicaciones_web.Shared.Application.Model;
 using atelier_platform_aplicaciones_web.Billing.Resources;
+using atelier_platform_aplicaciones_web.Operations.Domain.Repositories;
 using Microsoft.Extensions.Localization;
 
 namespace atelier_platform_aplicaciones_web.Billing.Application.Internal.CommandServices;
@@ -18,12 +19,18 @@ public enum BillingErrorCodes { CreationFailed, UpdateFailed, QuoteNotFound, App
 public class QuoteCommandService : IQuoteCommandService
 {
     private readonly IQuoteRepository _quoteRepository;
+    private readonly IWorkOrderRepository _workOrderRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IStringLocalizer<BillingMessages> _localizer;
 
-    public QuoteCommandService(IQuoteRepository quoteRepository, IUnitOfWork unitOfWork, IStringLocalizer<BillingMessages> localizer)
+    public QuoteCommandService(
+        IQuoteRepository quoteRepository, 
+        IWorkOrderRepository workOrderRepository,
+        IUnitOfWork unitOfWork, 
+        IStringLocalizer<BillingMessages> localizer)
     {
         _quoteRepository = quoteRepository;
+        _workOrderRepository = workOrderRepository;
         _unitOfWork = unitOfWork;
         _localizer = localizer;
     }
@@ -32,12 +39,18 @@ public class QuoteCommandService : IQuoteCommandService
     {
         try
         {
+            var workOrder = await _workOrderRepository.FindByIdWithTasksAndProductsAsync(new Operations.Domain.Model.ValueObjects.WorkOrderId(command.WorkOrderId));
+            if (workOrder == null)
+            {
+                return Result<Quote>.Failure(BillingErrorCodes.CreationFailed, _localizer["billing.error.workOrder.notFound"]);
+            }
+
             var quote = new Quote(
-            command.WorkOrderId,
-            command.BranchId,
-            command.SubtotalAmount,
-            command.DiscountPercentage
-        );
+                command.WorkOrderId,
+                command.BranchId,
+                workOrder.TotalAmount.Amount,
+                command.DiscountPercentage
+            );
 
             await _quoteRepository.AddAsync(quote);
             await _unitOfWork.CompleteAsync();
