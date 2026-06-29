@@ -24,21 +24,16 @@ public interface IVoucherCommandService
     /// </summary>
     /// <param name="command">The add payment command.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>A Result containing the new Payment entity or an error.</returns>
-    Task<Result<atelier_platform_aplicaciones_web.Billing.Domain.Model.Entities.Payment>> Handle(AddPaymentCommand command, CancellationToken cancellationToken = default);
+    /// <returns>A Result containing the updated Voucher or an error.</returns>
+    Task<Result<Voucher>> Handle(AddPaymentCommand command, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Removes a mistakenly registered payment from a voucher.
     /// </summary>
     /// <param name="command">The remove payment command.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
-    /// <summary>
-    ///     Removes a payment from a voucher.
-    /// </summary>
-    /// <param name="command">The remove payment command.</param>
-    /// <param name="cancellationToken">Cancellation token.</param>
-    /// <returns>A successful Result or an error if payment/voucher is not found.</returns>
-    Task<Result> Handle(RemovePaymentCommand command, CancellationToken cancellationToken = default);
+    /// <returns>A Result containing the updated Voucher or an error.</returns>
+    Task<Result<Voucher>> Handle(RemovePaymentCommand command, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Processes a complete checkout (Generates voucher and registers total payment immediately).
