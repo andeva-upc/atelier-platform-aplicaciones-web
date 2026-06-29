@@ -17,7 +17,7 @@ public class VoucherRepository : BaseRepository<Voucher>, IVoucherRepository
 
     public async Task<IEnumerable<Voucher>> FindByBranchIdAsync(System.Guid branchId)
     {
-        return await Context.Set<Voucher>().Where(v => v.BranchId == branchId).ToListAsync();
+        return await Context.Set<Voucher>().Include(v => v.Payments).Where(v => v.BranchId == branchId).ToListAsync();
     }
 
     public async Task<Voucher?> FindByIdWithPaymentsAsync(System.Guid id)

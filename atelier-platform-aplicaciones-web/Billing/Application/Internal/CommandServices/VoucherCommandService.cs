@@ -127,53 +127,52 @@ public class VoucherCommandService : IVoucherCommandService
             return Result<Voucher>.Failure(BillingErrorCodes.VoucherGenerationFailed, _localizer["billing.error.internal"]);
         }
     }
-    public async Task<Result<atelier_platform_aplicaciones_web.Billing.Domain.Model.Entities.Payment>> Handle(AddPaymentCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<Voucher>> Handle(AddPaymentCommand command, CancellationToken cancellationToken = default)
     {
         try
         {
             var voucher = await _voucherRepository.FindByIdWithPaymentsAsync(command.VoucherId);
-            if (voucher == null) return Result<atelier_platform_aplicaciones_web.Billing.Domain.Model.Entities.Payment>.Failure(BillingErrorCodes.VoucherNotFound, _localizer["billing.error.voucher.notFound"]);
+            if (voucher == null) return Result<Voucher>.Failure(BillingErrorCodes.VoucherNotFound, _localizer["billing.error.voucher.notFound"]);
 
             voucher.AddPayment(command.Amount, command.Method, voucher.Currency);
             
             _voucherRepository.Update(voucher);
             await _unitOfWork.CompleteAsync();
 
-            var paymentAdded = voucher.Payments.OrderByDescending(p => p.PaidAt).FirstOrDefault();
-            return Result<atelier_platform_aplicaciones_web.Billing.Domain.Model.Entities.Payment>.Success(paymentAdded!);
+            return Result<Voucher>.Success(voucher);
         }
         catch (Exception ex)
         {
             if (ex.Message == "Voucher is already fully paid." || ex.Message == "Cannot add payment to a canceled voucher.")
-                return Result<atelier_platform_aplicaciones_web.Billing.Domain.Model.Entities.Payment>.Failure(BillingErrorCodes.PaymentConflict, _localizer["billing.error.payment.conflict"]);
+                return Result<Voucher>.Failure(BillingErrorCodes.PaymentConflict, _localizer["billing.error.payment.conflict"]);
             
             if (ex.Message == "Payment amount exceeds the remaining balance.")
-                return Result<atelier_platform_aplicaciones_web.Billing.Domain.Model.Entities.Payment>.Failure(BillingErrorCodes.BadRequest, _localizer["billing.error.payment.conflict"]);
+                return Result<Voucher>.Failure(BillingErrorCodes.BadRequest, _localizer["billing.error.payment.conflict"]);
 
-            return Result<atelier_platform_aplicaciones_web.Billing.Domain.Model.Entities.Payment>.Failure(BillingErrorCodes.InternalError, _localizer["billing.error.internal"]);
+            return Result<Voucher>.Failure(BillingErrorCodes.InternalError, _localizer["billing.error.internal"]);
         }
     }
 
-    public async Task<Result> Handle(RemovePaymentCommand command, CancellationToken cancellationToken = default)
+    public async Task<Result<Voucher>> Handle(RemovePaymentCommand command, CancellationToken cancellationToken = default)
     {
         try
         {
             var voucher = await _voucherRepository.FindByIdWithPaymentsAsync(command.VoucherId);
-            if (voucher == null) return Result.Failure(BillingErrorCodes.VoucherNotFound, _localizer["billing.error.voucher.notFound"]);
+            if (voucher == null) return Result<Voucher>.Failure(BillingErrorCodes.VoucherNotFound, _localizer["billing.error.voucher.notFound"]);
 
             voucher.RemovePayment(command.PaymentId);
             
             _voucherRepository.Update(voucher);
             await _unitOfWork.CompleteAsync();
 
-            return Result.Success();
+            return Result<Voucher>.Success(voucher);
         }
         catch (Exception ex)
         {
             if (ex.Message == "Payment not found.")
-                return Result.Failure(BillingErrorCodes.PaymentNotFound, _localizer["billing.error.payment.notFound"]);
+                return Result<Voucher>.Failure(BillingErrorCodes.PaymentNotFound, _localizer["billing.error.payment.notFound"]);
 
-            return Result.Failure(BillingErrorCodes.InternalError, _localizer["billing.error.internal"]);
+            return Result<Voucher>.Failure(BillingErrorCodes.InternalError, _localizer["billing.error.internal"]);
         }
     }
 
