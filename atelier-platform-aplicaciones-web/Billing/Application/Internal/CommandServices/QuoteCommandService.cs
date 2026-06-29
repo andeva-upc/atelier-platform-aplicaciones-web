@@ -60,7 +60,7 @@ public class QuoteCommandService : IQuoteCommandService
                 return Result<Quote>.Failure(BillingErrorCodes.QuoteNotFound, _localizer["billing.error.quote.notFound"]);
             }
 
-            quote.Update(command.SubtotalAmount, command.DiscountPercentage);
+            quote.ApplyDiscount(command.DiscountPercentage);
             _quoteRepository.Update(quote);
             await _unitOfWork.CompleteAsync();
 
