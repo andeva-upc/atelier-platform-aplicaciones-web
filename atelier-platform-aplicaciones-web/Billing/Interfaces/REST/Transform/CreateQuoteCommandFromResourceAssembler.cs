@@ -10,7 +10,6 @@ public static class CreateQuoteCommandFromResourceAssembler
         return new CreateQuoteCommand(
             resource.WorkOrderId,
             resource.BranchId,
-            resource.SubtotalAmount,
             resource.DiscountPercentage
         );
     }

@@ -1,3 +1,4 @@
+using System.Linq;
 using atelier_platform_aplicaciones_web.Billing.Domain.Model.Aggregates;
 using atelier_platform_aplicaciones_web.Billing.Interfaces.REST.Resources;
 
@@ -7,20 +8,24 @@ public static class VoucherResourceFromEntityAssembler
 {
     public static VoucherResource ToResourceFromEntity(Voucher entity)
     {
+        var paymentsList = entity.Payments?
+            .Select(p => new PaymentResource(p.Id, p.Amount, p.Method))
+            .ToList() ?? new System.Collections.Generic.List<PaymentResource>();
+
+        var totalPaid = entity.Payments?.Sum(p => p.Amount) ?? 0m;
+
         return new VoucherResource(
             entity.Id,
             entity.QuoteId,
-            entity.BranchId,
-            entity.VoucherNumber,
-            entity.SubtotalAmount,
-            entity.TotalAmount,
             entity.Type,
-            entity.Status,
-            entity.Currency,
             entity.CustomerDocumentType,
             entity.CustomerDocumentNumber,
             entity.CustomerName,
-            entity.ExternalInvoiceId
+            entity.TotalAmount,
+            entity.Status,
+            entity.ExternalInvoiceId,
+            paymentsList,
+            totalPaid
         );
     }
 }

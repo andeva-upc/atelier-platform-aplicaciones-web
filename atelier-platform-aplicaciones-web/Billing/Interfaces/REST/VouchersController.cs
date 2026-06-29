@@ -105,7 +105,8 @@ public class VouchersController : ControllerBase
 
         if (result.IsSuccess)
         {
-            return Ok(new { message = "Payment registered successfully", paymentId = result.Value?.Id });
+            var voucherResource = VoucherResourceFromEntityAssembler.ToResourceFromEntity(result.Value!);
+            return Ok(voucherResource);
         }
 
         return ActionResultFromBillingCommandResultAssembler.MapFailureToActionResult(result.Error, result.Message, this, _localizer);
@@ -116,7 +117,7 @@ public class VouchersController : ControllerBase
     /// </summary>
     /// <param name="voucherId">The ID of the voucher.</param>
     /// <param name="paymentId">The ID of the payment to remove.</param>
-    /// <returns>A success message.</returns>
+    /// <returns>The updated Voucher resource.</returns>
     [HttpDelete("{voucherId}/payments/{paymentId}")]
     [SwaggerOperation(Summary = "Remove a payment from a voucher", Description = "Removes a payment registered by mistake")]
     public async Task<IActionResult> DeletePayment(System.Guid voucherId, System.Guid paymentId)
@@ -126,7 +127,8 @@ public class VouchersController : ControllerBase
 
         if (result.IsSuccess)
         {
-            return Ok(new { message = "Payment removed successfully" });
+            var voucherResource = VoucherResourceFromEntityAssembler.ToResourceFromEntity(result.Value!);
+            return Ok(voucherResource);
         }
 
         return ActionResultFromBillingCommandResultAssembler.MapFailureToActionResult(result.Error, result.Message, this, _localizer);
