@@ -77,9 +77,9 @@ public class BranchesController(
         return Ok(BranchResourceFromEntityAssembler.ToResourceFromEntity(branch));
     }
 
-    [HttpGet("workshop/{workshopId}")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get branches by workshop ID", Description = "Retrieves all branches belonging to a specific workshop")]
-    public async Task<ActionResult> GetBranchesByWorkshopId(Guid workshopId, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetBranchesByWorkshopId([FromQuery] Guid workshopId, CancellationToken cancellationToken)
     {
         var query = new GetAllBranchesByWorkshopIdQuery(new WorkshopId(workshopId));
         var branches = await branchQueryService.Handle(query, cancellationToken);
@@ -88,7 +88,7 @@ public class BranchesController(
         return Ok(resources);
     }
 
-    [HttpPost("{branchId}/subscriptions/pay")]
+    [HttpPost("{branchId}/subscriptions")]
     [SwaggerOperation(Summary = "Simulate payment and assign subscription", Description = "Simulates a payment (Mock Stripe) using a dummy credit card and assigns the subscription plan")]
     public async Task<ActionResult> AssignSubscription(Guid branchId, [FromBody] AssignSubscriptionResource resource, CancellationToken cancellationToken)
     {
@@ -103,7 +103,7 @@ public class BranchesController(
         );
     }
 
-    [HttpDelete("{branchId}/subscriptions/active")]
+    [HttpDelete("{branchId}/subscription")]
     [SwaggerOperation(Summary = "Cancel an active subscription", Description = "Cancels the currently active subscription of a branch")]
     public async Task<ActionResult> CancelSubscription(Guid branchId, CancellationToken cancellationToken)
     {

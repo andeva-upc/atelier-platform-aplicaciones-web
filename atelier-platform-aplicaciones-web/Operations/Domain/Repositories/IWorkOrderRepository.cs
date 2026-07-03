@@ -24,4 +24,6 @@ public interface IWorkOrderRepository : IBaseRepository<WorkOrder>
     Task<bool> ExistsByIdAsync(WorkOrderId id, CancellationToken cancellationToken = default);
     
     Task<int> FindMaxInternalNumberByBranchIdAsync(BranchId branchId, CancellationToken cancellationToken = default);
+    
+    Task<WorkOrder?> FindByTaskIdAsync(WorkOrderTaskId taskId, CancellationToken cancellationToken = default);
 }

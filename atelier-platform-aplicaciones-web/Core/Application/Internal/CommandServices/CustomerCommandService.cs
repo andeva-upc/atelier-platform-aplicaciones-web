@@ -38,7 +38,7 @@ public class CustomerCommandService(
 
     public async Task<Result<Customer>> Handle(UpdateCustomerCommand command, CancellationToken cancellationToken = default)
     {
-        var customer = await customerRepository.FindByUserIdAsync(command.UserId, cancellationToken);
+        var customer = await customerRepository.FindByIdAsync(command.CustomerId.Value, cancellationToken);
         if (customer == null)
         {
             return Result<Customer>.Failure(CoreError.CustomerNotFound, "core.error.customer.notFound");
@@ -59,7 +59,7 @@ public class CustomerCommandService(
 
     public async Task<Result> Handle(DeleteCustomerCommand command, CancellationToken cancellationToken = default)
     {
-        var customer = await customerRepository.FindByUserIdAsync(command.UserId, cancellationToken);
+        var customer = await customerRepository.FindByIdAsync(command.CustomerId.Value, cancellationToken);
         if (customer == null)
         {
             return Result.Failure(CoreError.CustomerNotFound, "core.error.customer.notFound");

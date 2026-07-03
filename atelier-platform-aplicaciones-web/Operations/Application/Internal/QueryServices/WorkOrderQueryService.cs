@@ -32,6 +32,15 @@ public class WorkOrderQueryService(
         return await workOrderRepository.FindByVehicleIdAsync(query.VehicleId, cancellationToken);
     }
     
+    public async Task<WorkOrder?> Handle(GetWorkOrderByTaskIdQuery query, CancellationToken cancellationToken = default)
+    {
+        if (query.TaskId.Value == Guid.Empty)
+        {
+            throw new ArgumentException("operations.error.query.taskId.required");
+        }
+        return await workOrderRepository.FindByTaskIdAsync(query.TaskId, cancellationToken);
+    }
+    
     public string GetBranchCode(Guid branchId)
     {
         try

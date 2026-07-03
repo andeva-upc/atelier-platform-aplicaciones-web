@@ -36,7 +36,7 @@ public class EmployeeCommandService(
 
     public async Task<Result<Employee>> Handle(UpdateEmployeeCommand command, CancellationToken cancellationToken = default)
     {
-        var employee = await employeeRepository.FindByUserIdAsync(command.UserId, cancellationToken);
+        var employee = await employeeRepository.FindByIdAsync(command.EmployeeId.Value, cancellationToken);
         if (employee == null)
         {
             return Result<Employee>.Failure(CoreError.EmployeeNotFound, "core.error.employee.notFound");
@@ -56,7 +56,7 @@ public class EmployeeCommandService(
 
     public async Task<Result> Handle(DeleteEmployeeCommand command, CancellationToken cancellationToken = default)
     {
-        var employee = await employeeRepository.FindByUserIdAsync(command.UserId, cancellationToken);
+        var employee = await employeeRepository.FindByIdAsync(command.EmployeeId.Value, cancellationToken);
         if (employee == null)
         {
             return Result.Failure(CoreError.EmployeeNotFound, "core.error.employee.notFound");

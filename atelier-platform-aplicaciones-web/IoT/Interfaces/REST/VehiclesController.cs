@@ -132,4 +132,17 @@ public class VehiclesController(
         var resources = alerts.Select(DtcAlertResourceFromEntityAssembler.ToResourceFromEntity);
         return Ok(resources);
     }
+
+    [HttpGet("{id}")]
+    [SwaggerOperation(Summary = "Get client vehicle by ID", Description = "Retrieves client vehicle details by its unique identifier")]
+    public async Task<ActionResult> GetVehicleById(Guid id, CancellationToken cancellationToken)
+    {
+        var query = new GetVehicleByIdQuery(new VehicleId(id));
+        var vehicle = await vehicleQueryService.Handle(query, cancellationToken);
+        if (vehicle == null)
+        {
+            return NotFound();
+        }
+        return Ok(VehicleResourceFromEntityAssembler.ToResourceFromEntity(vehicle));
+    }
 }
