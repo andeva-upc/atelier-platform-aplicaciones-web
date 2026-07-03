@@ -44,11 +44,11 @@ public class EmployeesController(
         );
     }
 
-    [HttpPut("user/{userId}")]
-    [SwaggerOperation(Summary = "Update an employee profile", Description = "Updates an existing employee profile using the user ID")]
-    public async Task<ActionResult> UpdateEmployee(Guid userId, [FromBody] UpdateEmployeeResource resource, CancellationToken cancellationToken)
+    [HttpPut("{employeeId}")]
+    [SwaggerOperation(Summary = "Update an employee profile", Description = "Updates an existing employee profile")]
+    public async Task<ActionResult> UpdateEmployee(Guid employeeId, [FromBody] UpdateEmployeeResource resource, CancellationToken cancellationToken)
     {
-        var command = UpdateEmployeeCommandFromResourceAssembler.ToCommandFromResource(userId, resource);
+        var command = UpdateEmployeeCommandFromResourceAssembler.ToCommandFromResource(employeeId, resource);
         var result = await employeeCommandService.Handle(command, cancellationToken);
 
         return ActionResultFromCoreCommandResultAssembler.ToOkActionResult(
@@ -72,9 +72,9 @@ public class EmployeesController(
         return Ok(EmployeeResourceFromEntityAssembler.ToResourceFromEntity(employee));
     }
 
-    [HttpGet("user/{userId}")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get an employee profile by User ID", Description = "Retrieves the details of a specific employee profile using the User ID")]
-    public async Task<ActionResult> GetEmployeeByUserId(Guid userId, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetEmployeeByUserId([FromQuery] Guid userId, CancellationToken cancellationToken)
     {
         var query = new GetEmployeeByUserIdQuery(new UserId(userId));
         var employee = await employeeQueryService.Handle(query, cancellationToken);
@@ -84,11 +84,23 @@ public class EmployeesController(
         return Ok(EmployeeResourceFromEntityAssembler.ToResourceFromEntity(employee));
     }
 
-    [HttpDelete("user/{userId}")]
-    [SwaggerOperation(Summary = "Delete an employee profile", Description = "Deletes an existing employee profile using the user ID")]
-    public async Task<ActionResult> DeleteEmployee(Guid userId, CancellationToken cancellationToken)
+    [HttpGet("document")]
+    [SwaggerOperation(Summary = "Get an employee profile by Document Number", Description = "Retrieves the details of a specific employee profile using their Document Number")]
+    public async Task<ActionResult> GetEmployeeByDocumentNumber([FromQuery] string documentNumber, CancellationToken cancellationToken)
     {
-        var command = new DeleteEmployeeCommand(new UserId(userId));
+        var query = new GetEmployeeByDocumentNumberQuery(documentNumber);
+        var employee = await employeeQueryService.Handle(query, cancellationToken);
+
+        if (employee == null) return NotFound();
+
+        return Ok(EmployeeResourceFromEntityAssembler.ToResourceFromEntity(employee));
+    }
+
+    [HttpDelete("{employeeId}")]
+    [SwaggerOperation(Summary = "Delete an employee profile", Description = "Deletes an existing employee profile")]
+    public async Task<ActionResult> DeleteEmployee(Guid employeeId, CancellationToken cancellationToken)
+    {
+        var command = new DeleteEmployeeCommand(new EmployeeId(employeeId));
         var result = await employeeCommandService.Handle(command, cancellationToken);
 
         return ActionResultFromCoreCommandResultAssembler.ToNoContentActionResult(

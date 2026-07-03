@@ -44,11 +44,11 @@ public class OwnersController(
         );
     }
 
-    [HttpPut("user/{userId}")]
-    [SwaggerOperation(Summary = "Update an owner profile", Description = "Updates an existing owner profile using the user ID")]
-    public async Task<ActionResult> UpdateOwner(Guid userId, [FromBody] UpdateOwnerResource resource, CancellationToken cancellationToken)
+    [HttpPut("{ownerId}")]
+    [SwaggerOperation(Summary = "Update an owner profile", Description = "Updates an existing owner profile using the owner ID")]
+    public async Task<ActionResult> UpdateOwner(Guid ownerId, [FromBody] UpdateOwnerResource resource, CancellationToken cancellationToken)
     {
-        var command = UpdateOwnerCommandFromResourceAssembler.ToCommandFromResource(userId, resource);
+        var command = UpdateOwnerCommandFromResourceAssembler.ToCommandFromResource(ownerId, resource);
         var result = await ownerCommandService.Handle(command, cancellationToken);
 
         return ActionResultFromCoreCommandResultAssembler.ToOkActionResult(
@@ -72,9 +72,9 @@ public class OwnersController(
         return Ok(OwnerResourceFromEntityAssembler.ToResourceFromEntity(owner));
     }
 
-    [HttpGet("user/{userId}")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get an owner profile by User ID", Description = "Retrieves the details of a specific owner profile using the User ID")]
-    public async Task<ActionResult> GetOwnerByUserId(Guid userId, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetOwnerByUserId([FromQuery] Guid userId, CancellationToken cancellationToken)
     {
         var query = new GetOwnerByUserIdQuery(new UserId(userId));
         var owner = await ownerQueryService.Handle(query, cancellationToken);
@@ -84,11 +84,11 @@ public class OwnersController(
         return Ok(OwnerResourceFromEntityAssembler.ToResourceFromEntity(owner));
     }
 
-    [HttpDelete("user/{userId}")]
-    [SwaggerOperation(Summary = "Delete an owner profile", Description = "Deletes an existing owner profile using the user ID")]
-    public async Task<ActionResult> DeleteOwner(Guid userId, CancellationToken cancellationToken)
+    [HttpDelete("{ownerId}")]
+    [SwaggerOperation(Summary = "Delete an owner profile", Description = "Deletes an existing owner profile using the owner ID")]
+    public async Task<ActionResult> DeleteOwner(Guid ownerId, CancellationToken cancellationToken)
     {
-        var command = new DeleteOwnerCommand(new UserId(userId));
+        var command = new DeleteOwnerCommand(new OwnerId(ownerId));
         var result = await ownerCommandService.Handle(command, cancellationToken);
 
         return ActionResultFromCoreCommandResultAssembler.ToNoContentActionResult(

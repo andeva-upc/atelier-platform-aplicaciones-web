@@ -18,4 +18,9 @@ public class EmployeeQueryService(IEmployeeRepository employeeRepository) : IEmp
     {
         return await employeeRepository.FindByUserIdAsync(query.UserId, cancellationToken);
     }
+
+    public async Task<Employee?> Handle(GetEmployeeByDocumentNumberQuery query, CancellationToken cancellationToken = default)
+    {
+        return await employeeRepository.FindByDocumentNumberAsync(query.DocumentNumber, cancellationToken);
+    }
 }

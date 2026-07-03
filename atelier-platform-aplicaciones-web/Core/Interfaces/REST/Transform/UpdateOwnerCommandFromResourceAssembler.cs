@@ -7,10 +7,10 @@ namespace atelier_platform_aplicaciones_web.Core.Interfaces.REST.Transform;
 
 public static class UpdateOwnerCommandFromResourceAssembler
 {
-    public static UpdateOwnerCommand ToCommandFromResource(Guid userId, UpdateOwnerResource resource)
+    public static UpdateOwnerCommand ToCommandFromResource(Guid ownerId, UpdateOwnerResource resource)
     {
         return new UpdateOwnerCommand(
-            new UserId(userId),
+            new OwnerId(ownerId),
             new PersonName(resource.FirstName, resource.LastName),
             new Document(resource.DocumentType, resource.DocumentNumber),
             new Phone(resource.Phone)

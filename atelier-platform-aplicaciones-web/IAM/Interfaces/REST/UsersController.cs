@@ -23,6 +23,31 @@ public class UsersController(
     Microsoft.Extensions.Localization.IStringLocalizer<atelier_platform_aplicaciones_web.IAM.Resources.IamMessages> localizer,
     atelier_platform_aplicaciones_web.Shared.Interfaces.Rest.ProblemDetails.ProblemDetailsFactory problemDetailsFactory) : ControllerBase
 {
+    [HttpPost]
+    [AllowAnonymous]
+    public async Task<IActionResult> SignUp([FromBody] SignUpResource resource, CancellationToken cancellationToken)
+    {
+        var command = SignUpCommandFromResourceAssembler.ToCommandFromResource(resource);
+        var result = await userCommandService.Handle(command, cancellationToken);
+
+        if (!result.IsSuccess)
+            return IamErrorToActionAssembler.ToActionResult(result.Error, result.Message, this, problemDetailsFactory, localizer);
+
+        return StatusCode(201, new { Message = "User created successfully." });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetUserByEmail([FromQuery] string email, CancellationToken cancellationToken)
+    {
+        var query = new GetUserByEmailQuery(new EmailAddress(email));
+        var user = await userQueryService.Handle(query, cancellationToken);
+
+        if (user == null) return NotFound();
+
+        var resource = UserResourceFromEntityAssembler.ToResourceFromEntity(user);
+        return Ok(resource);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUserById(Guid id, CancellationToken cancellationToken)
     {

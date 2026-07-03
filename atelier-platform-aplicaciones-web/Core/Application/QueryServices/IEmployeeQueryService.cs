@@ -9,4 +9,5 @@ public interface IEmployeeQueryService
 {
     Task<Employee?> Handle(GetEmployeeByIdQuery query, CancellationToken cancellationToken = default);
     Task<Employee?> Handle(GetEmployeeByUserIdQuery query, CancellationToken cancellationToken = default);
+    Task<Employee?> Handle(GetEmployeeByDocumentNumberQuery query, CancellationToken cancellationToken = default);
 }

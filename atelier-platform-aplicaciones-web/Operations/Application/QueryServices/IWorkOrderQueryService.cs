@@ -11,6 +11,7 @@ public interface IWorkOrderQueryService
     Task<WorkOrder?> Handle(GetWorkOrderByIdQuery query, CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkOrder>> Handle(GetWorkOrdersByBranchIdQuery query, CancellationToken cancellationToken = default);
     Task<IEnumerable<WorkOrder>> Handle(GetWorkOrdersByVehicleIdQuery query, CancellationToken cancellationToken = default);
+    Task<WorkOrder?> Handle(GetWorkOrderByTaskIdQuery query, CancellationToken cancellationToken = default);
     
     string GetBranchCode(Guid branchId);
 }
