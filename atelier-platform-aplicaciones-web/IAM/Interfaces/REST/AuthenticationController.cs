@@ -20,7 +20,7 @@ public class AuthenticationController(
     Microsoft.Extensions.Localization.IStringLocalizer<atelier_platform_aplicaciones_web.IAM.Resources.IamMessages> localizer,
     atelier_platform_aplicaciones_web.Shared.Interfaces.Rest.ProblemDetails.ProblemDetailsFactory problemDetailsFactory) : ControllerBase
 {
-    [HttpPost("sign-in")]
+    [HttpPost("sessions")]
     public async Task<IActionResult> SignIn([FromBody] SignInResource resource, CancellationToken cancellationToken)
     {
         var command = SignInCommandFromResourceAssembler.ToCommandFromResource(resource);
@@ -33,7 +33,7 @@ public class AuthenticationController(
         return Ok(authenticatedUserResource);
     }
 
-    [HttpPost("google-sign-in")]
+    [HttpPost("sessions/google")]
     public async Task<IActionResult> GoogleSignIn([FromBody] GoogleSignInResource resource, CancellationToken cancellationToken)
     {
         var command = GoogleSignInCommandFromResourceAssembler.ToCommandFromResource(resource);
@@ -46,19 +46,8 @@ public class AuthenticationController(
         return Ok(authenticatedUserResource);
     }
 
-    [HttpPost("sign-up")]
-    public async Task<IActionResult> SignUp([FromBody] SignUpResource resource, CancellationToken cancellationToken)
-    {
-        var command = SignUpCommandFromResourceAssembler.ToCommandFromResource(resource);
-        var result = await userCommandService.Handle(command, cancellationToken);
 
-        if (!result.IsSuccess)
-            return IamErrorToActionAssembler.ToActionResult(result.Error, result.Message, this, problemDetailsFactory, localizer);
-
-        return Ok(new { Message = "User created successfully." });
-    }
-
-    [HttpPost("forgot-password")]
+    [HttpPost("password-recoveries")]
     public async Task<IActionResult> ForgotPassword([FromBody] PasswordRecoveryResource resource, CancellationToken cancellationToken)
     {
         var command = GeneratePasswordRecoveryTokenCommandFromResourceAssembler.ToCommandFromResource(resource);
@@ -70,7 +59,7 @@ public class AuthenticationController(
         return Ok(new { Message = "Password recovery token generated and sent." });
     }
 
-    [HttpPost("reset-password")]
+    [HttpPost("password-resets")]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordResource resource, CancellationToken cancellationToken)
     {
         var command = ResetPasswordCommandFromResourceAssembler.ToCommandFromResource(resource);

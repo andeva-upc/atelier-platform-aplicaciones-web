@@ -36,7 +36,7 @@ public class OwnerCommandService(
 
     public async Task<Result<Owner>> Handle(UpdateOwnerCommand command, CancellationToken cancellationToken = default)
     {
-        var owner = await ownerRepository.FindByUserIdAsync(command.UserId, cancellationToken);
+        var owner = await ownerRepository.FindByIdAsync(command.OwnerId.Value, cancellationToken);
         if (owner == null)
         {
             return Result<Owner>.Failure(CoreError.OwnerNotFound, "core.error.owner.notFound");
@@ -56,7 +56,7 @@ public class OwnerCommandService(
 
     public async Task<Result> Handle(DeleteOwnerCommand command, CancellationToken cancellationToken = default)
     {
-        var owner = await ownerRepository.FindByUserIdAsync(command.UserId, cancellationToken);
+        var owner = await ownerRepository.FindByIdAsync(command.OwnerId.Value, cancellationToken);
         if (owner == null)
         {
             return Result.Failure(CoreError.OwnerNotFound, "core.error.owner.notFound");

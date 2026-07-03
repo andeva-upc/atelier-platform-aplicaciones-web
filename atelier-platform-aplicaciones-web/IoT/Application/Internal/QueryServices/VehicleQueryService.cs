@@ -68,4 +68,9 @@ public class VehicleQueryService(
 
         return await dtcAlertRepository.ListByVehicleIdAndMinDateAsync(query.VehicleId, activeReg.CreatedAt, cancellationToken);
     }
+
+    public async Task<Vehicle?> Handle(GetVehicleByIdQuery query, CancellationToken cancellationToken = default)
+    {
+        return await context.Set<Vehicle>().FirstOrDefaultAsync(v => v.Id == query.VehicleId, cancellationToken);
+    }
 }

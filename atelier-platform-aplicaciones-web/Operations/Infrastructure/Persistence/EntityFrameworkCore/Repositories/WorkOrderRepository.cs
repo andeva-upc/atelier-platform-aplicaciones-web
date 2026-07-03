@@ -72,4 +72,12 @@ public class WorkOrderRepository : BaseRepository<WorkOrder>, IWorkOrderReposito
             .Where(w => w.VehicleId == vehicleId)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<WorkOrder?> FindByTaskIdAsync(WorkOrderTaskId taskId, CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<WorkOrder>()
+            .Include(w => w.Tasks)
+                .ThenInclude(t => t.Products)
+            .FirstOrDefaultAsync(w => w.Tasks.Any(t => t.Id == taskId), cancellationToken);
+    }
 }
