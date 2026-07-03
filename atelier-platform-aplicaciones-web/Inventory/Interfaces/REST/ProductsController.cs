@@ -14,7 +14,7 @@ namespace atelier_platform_aplicaciones_web.Inventory.Interfaces.REST;
 [Route("api/v1/inventory/products")]
 [Produces(MediaTypeNames.Application.Json)]
 [Tags("Inventory Products")]
-[Authorize]
+[AllowAnonymous]
 public class ProductsController(
     IProductCommandService productCommandService,
     atelier_platform_aplicaciones_web.Inventory.Application.QueryServices.IProductQueryService _productQueryService) : ControllerBase

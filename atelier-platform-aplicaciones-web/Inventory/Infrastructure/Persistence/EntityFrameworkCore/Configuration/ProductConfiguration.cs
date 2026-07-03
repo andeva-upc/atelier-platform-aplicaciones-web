@@ -20,12 +20,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Category)
             .HasConversion(v => v.Value, v => new atelier_platform_aplicaciones_web.Inventory.Domain.Model.ValueObjects.ProductCategory(v))
-            .HasColumnName("category")
+            .HasColumnName("category_id")
             .IsRequired();
 
         builder.Property(p => p.Name)
             .HasConversion(v => v.Name, v => new atelier_platform_aplicaciones_web.Inventory.Domain.Model.ValueObjects.ProductName(v))
-            .HasColumnName("name")
+            .HasColumnName("product_name")
             .IsRequired();
 
         builder.Property(p => p.Sku)
@@ -38,7 +38,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(p => p.CurrentSellingPrice)
             .HasConversion(v => v.Amount, v => new atelier_platform_aplicaciones_web.Shared.Domain.Model.ValueObjects.Money(v))
             .HasColumnName("current_selling_price")
-            .HasColumnType("decimal(18,2)")
+            .HasColumnType("decimal(10,2)")
             .IsRequired();
 
         builder.Property(p => p.CurrentStock)
