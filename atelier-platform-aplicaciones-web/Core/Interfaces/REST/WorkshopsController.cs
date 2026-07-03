@@ -74,9 +74,9 @@ public class WorkshopsController(
         return Ok(WorkshopResourceFromEntityAssembler.ToResourceFromEntity(workshop));
     }
 
-    [HttpGet("owner/{ownerId}")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get workshops by owner ID", Description = "Retrieves all workshops belonging to a specific owner")]
-    public async Task<ActionResult> GetWorkshopsByOwnerId(Guid ownerId, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetWorkshopsByOwnerId([FromQuery] Guid ownerId, CancellationToken cancellationToken)
     {
         var query = new GetAllWorkshopsByOwnerIdQuery(new OwnerId(ownerId));
         var workshops = await workshopQueryService.Handle(query, cancellationToken);

@@ -45,11 +45,11 @@ public class CustomersController(
         );
     }
 
-    [HttpPut("user/{userId}")]
-    [SwaggerOperation(Summary = "Update a customer profile", Description = "Updates an existing customer profile using the user ID")]
-    public async Task<ActionResult> UpdateCustomer(Guid userId, [FromBody] UpdateCustomerResource resource, CancellationToken cancellationToken)
+    [HttpPut("{customerId}")]
+    [SwaggerOperation(Summary = "Update a customer profile", Description = "Updates an existing customer profile using the customer ID")]
+    public async Task<ActionResult> UpdateCustomer(Guid customerId, [FromBody] UpdateCustomerResource resource, CancellationToken cancellationToken)
     {
-        var command = UpdateCustomerCommandFromResourceAssembler.ToCommandFromResource(userId, resource);
+        var command = UpdateCustomerCommandFromResourceAssembler.ToCommandFromResource(customerId, resource);
         var result = await customerCommandService.Handle(command, cancellationToken);
 
         return ActionResultFromCoreCommandResultAssembler.ToOkActionResult(
@@ -73,9 +73,9 @@ public class CustomersController(
         return Ok(CustomerResourceFromEntityAssembler.ToResourceFromEntity(customer));
     }
 
-    [HttpGet("user/{userId}")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get a customer profile by User ID", Description = "Retrieves the details of a specific customer profile using the User ID")]
-    public async Task<ActionResult> GetCustomerByUserId(Guid userId, CancellationToken cancellationToken)
+    public async Task<ActionResult> GetCustomerByUserId([FromQuery] Guid userId, CancellationToken cancellationToken)
     {
         var query = new GetCustomerByUserIdQuery(new UserId(userId));
         var customer = await customerQueryService.Handle(query, cancellationToken);
@@ -85,11 +85,11 @@ public class CustomersController(
         return Ok(CustomerResourceFromEntityAssembler.ToResourceFromEntity(customer));
     }
 
-    [HttpDelete("user/{userId}")]
-    [SwaggerOperation(Summary = "Delete a customer profile", Description = "Deletes an existing customer profile using the user ID")]
-    public async Task<ActionResult> DeleteCustomer(Guid userId, CancellationToken cancellationToken)
+    [HttpDelete("{customerId}")]
+    [SwaggerOperation(Summary = "Delete a customer profile", Description = "Deletes an existing customer profile using the customer ID")]
+    public async Task<ActionResult> DeleteCustomer(Guid customerId, CancellationToken cancellationToken)
     {
-        var command = new DeleteCustomerCommand(new UserId(userId));
+        var command = new DeleteCustomerCommand(new CustomerId(customerId));
         var result = await customerCommandService.Handle(command, cancellationToken);
 
         return ActionResultFromCoreCommandResultAssembler.ToNoContentActionResult(

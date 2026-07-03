@@ -18,9 +18,16 @@ public class EmployeeRepository(AppDbContext context) : BaseRepository<Employee>
         return await Context.Set<Employee>().FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
     }
 
-    public async Task<Employee?> FindByUserIdAsync(UserId userId, CancellationToken cancellationToken)
+    public async Task<Employee?> FindByUserIdAsync(UserId userId, CancellationToken cancellationToken = default)
     {
-        return await Context.Set<Employee>().FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+        return await Context.Set<Employee>()
+            .FirstOrDefaultAsync(e => e.UserId == userId, cancellationToken);
+    }
+
+    public async Task<Employee?> FindByDocumentNumberAsync(string documentNumber, CancellationToken cancellationToken = default)
+    {
+        return await Context.Set<Employee>()
+            .FirstOrDefaultAsync(e => e.Document.DocumentNumber == documentNumber, cancellationToken);
     }
 
     public async Task<bool> ExistsByUserIdAsync(UserId userId, CancellationToken cancellationToken)

@@ -74,35 +74,7 @@ public class WorkOrdersController(
         return ToResponse(result);
     }
 
-    [HttpPost("{id}/tasks/{taskId}/products")]
-    [SwaggerOperation(Summary = "Add an inventory product/part to a task")]
-    public async Task<ActionResult> AddProductToTask(Guid id, Guid taskId, [FromBody] AddProductResource resource)
-    {
-        var command = WorkOrderCommandFromResourceAssembler.ToCommandFromResource(id, taskId, resource);
-        var result = await workOrderCommandService.Handle(command);
 
-        return ToResponse(result);
-    }
-
-    [HttpPut("{id}/tasks/{taskId}/products/{productId}")]
-    [SwaggerOperation(Summary = "Update a product's quantity in a task")]
-    public async Task<ActionResult> UpdateProductQuantity(Guid id, Guid taskId, Guid productId, [FromBody] UpdateProductQuantityInTaskResource resource)
-    {
-        var command = WorkOrderCommandFromResourceAssembler.ToCommandFromResource(id, taskId, productId, resource);
-        var result = await workOrderCommandService.Handle(command);
-
-        return ToResponse(result);
-    }
-
-    [HttpDelete("{id}/tasks/{taskId}/products/{productId}")]
-    [SwaggerOperation(Summary = "Remove a product/part from a task (releases stock reservation)")]
-    public async Task<ActionResult> RemoveProductFromTask(Guid id, Guid taskId, Guid productId)
-    {
-        var command = new RemoveProductFromTaskCommand(new WorkOrderId(id), new WorkOrderTaskId(taskId), new ProductId(productId));
-        var result = await workOrderCommandService.Handle(command);
-
-        return ToResponse(result);
-    }
 
     [HttpDelete("{id}/tasks/{taskId}")]
     [SwaggerOperation(Summary = "Remove a task from the Work Order (releases all task's stock reservations)")]
@@ -124,35 +96,7 @@ public class WorkOrdersController(
         return ActionResultFromWorkOrderCommandResultAssembler.ToNoContentActionResult(result, this, localizer);
     }
 
-    [HttpPost("{id}/tasks/{taskId}/start")]
-    [SwaggerOperation(Summary = "Start executing a task (sets status to DOING and captures startedAt)")]
-    public async Task<ActionResult> StartTask(Guid id, Guid taskId)
-    {
-        var command = new StartTaskCommand(new WorkOrderId(id), new WorkOrderTaskId(taskId));
-        var result = await workOrderCommandService.Handle(command);
 
-        return ToResponse(result);
-    }
-
-    [HttpPost("{id}/tasks/{taskId}/complete")]
-    [SwaggerOperation(Summary = "Complete a task (sets status to COMPLETED and captures completedAt)")]
-    public async Task<ActionResult> CompleteTask(Guid id, Guid taskId)
-    {
-        var command = new CompleteTaskCommand(new WorkOrderId(id), new WorkOrderTaskId(taskId));
-        var result = await workOrderCommandService.Handle(command);
-
-        return ToResponse(result);
-    }
-
-    [HttpPost("{id}/tasks/{taskId}/reopen")]
-    [SwaggerOperation(Summary = "Reopen a completed task (returns task to DOING, clears completedAt, keeps stock reserved)")]
-    public async Task<ActionResult> ReopenTask(Guid id, Guid taskId)
-    {
-        var command = new ReopenTaskCommand(new WorkOrderId(id), new WorkOrderTaskId(taskId));
-        var result = await workOrderCommandService.Handle(command);
-
-        return ToResponse(result);
-    }
 
     [HttpGet("{id}")]
     [ActionName(nameof(GetWorkOrderById))]
@@ -166,34 +110,37 @@ public class WorkOrdersController(
         string branchCode = workOrderQueryService.GetBranchCode(workOrder.BranchId.Value);
         return Ok(WorkOrderResourceFromEntityAssembler.ToResourceFromEntity(workOrder, branchCode));
     }
-    [HttpGet("branch/{branchId}")]
-    [SwaggerOperation(Summary = "Get all Work Orders for a specific branch")]
-    public async Task<ActionResult> GetWorkOrdersByBranch(Guid branchId)
+    [HttpGet]
+    [SwaggerOperation(Summary = "Get Work Orders", Description = "Retrieves a list of all Work Orders, optionally filtered by branchId or vehicleId")]
+    public async Task<ActionResult> GetWorkOrders([FromQuery] Guid? branchId, [FromQuery] Guid? vehicleId)
     {
-        var query = new GetWorkOrdersByBranchIdQuery(new BranchId(branchId));
-        var result = await workOrderQueryService.Handle(query);
-        
-        // Como todos son de la misma sucursal, consultamos una sola vez
-        string branchCode = workOrderQueryService.GetBranchCode(branchId);
-        var resources = result.Select(wo => WorkOrderResourceFromEntityAssembler.ToResourceFromEntity(wo, branchCode));
-        
-        return Ok(resources);
-    }
-    [HttpGet("vehicle/{vehicleId}")]
-    [SwaggerOperation(Summary = "Get all Work Orders (service history) for a specific vehicle")]
-    public async Task<ActionResult> GetWorkOrdersByVehicle(Guid vehicleId)
-    {
-        var query = new GetWorkOrdersByVehicleIdQuery(new VehicleId(vehicleId));
-        var result = await workOrderQueryService.Handle(query);
-        
-        // Iteramos porque un vehículo pudo haber ido a diferentes sucursales
-        var resources = result.Select(wo => 
+        if (branchId.HasValue)
         {
-            string branchCode = workOrderQueryService.GetBranchCode(wo.BranchId.Value);
-            return WorkOrderResourceFromEntityAssembler.ToResourceFromEntity(wo, branchCode);
-        });
-        
-        return Ok(resources);
+            var query = new GetWorkOrdersByBranchIdQuery(new BranchId(branchId.Value));
+            var result = await workOrderQueryService.Handle(query);
+            
+            string branchCode = workOrderQueryService.GetBranchCode(branchId.Value);
+            var resources = result.Select(wo => WorkOrderResourceFromEntityAssembler.ToResourceFromEntity(wo, branchCode));
+            
+            return Ok(resources);
+        }
+        else if (vehicleId.HasValue)
+        {
+            var query = new GetWorkOrdersByVehicleIdQuery(new VehicleId(vehicleId.Value));
+            var result = await workOrderQueryService.Handle(query);
+            
+            var resources = result.Select(wo => 
+            {
+                string branchCode = workOrderQueryService.GetBranchCode(wo.BranchId.Value);
+                return WorkOrderResourceFromEntityAssembler.ToResourceFromEntity(wo, branchCode);
+            });
+            
+            return Ok(resources);
+        }
+        else
+        {
+            return BadRequest("Either branchId or vehicleId query parameter is required.");
+        }
     }
 
     [HttpPut("{id}")]

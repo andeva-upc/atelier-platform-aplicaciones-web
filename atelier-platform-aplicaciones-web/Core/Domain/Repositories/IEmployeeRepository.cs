@@ -11,5 +11,6 @@ public interface IEmployeeRepository : IBaseRepository<Employee>
 {
     Task<Employee?> FindEmployeeByIdAsync(EmployeeId id, CancellationToken cancellationToken);
     Task<Employee?> FindByUserIdAsync(UserId userId, CancellationToken cancellationToken);
+    Task<Employee?> FindByDocumentNumberAsync(string documentNumber, CancellationToken cancellationToken);
     Task<bool> ExistsByUserIdAsync(UserId userId, CancellationToken cancellationToken);
 }

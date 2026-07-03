@@ -44,7 +44,7 @@ public class ServicesController(
             nameof(GetServiceById));
     }
 
-    [HttpPut("service/{serviceId}")]
+    [HttpPut("{serviceId}")]
     [SwaggerOperation(Summary = "Update a service")]
     public async Task<ActionResult> UpdateService(Guid serviceId, [FromBody] UpdateServiceResource resource)
     {
@@ -54,7 +54,7 @@ public class ServicesController(
         return ActionResultFromServiceCommandResultAssembler.ToOkActionResult(result, this, localizer);
     }
 
-    [HttpDelete("service/{serviceId}")]
+    [HttpDelete("{serviceId}")]
     [SwaggerOperation(Summary = "Delete a service")]
     public async Task<ActionResult> DeleteService(Guid serviceId)
     {
@@ -64,9 +64,9 @@ public class ServicesController(
         return ActionResultFromServiceCommandResultAssembler.ToNoContentActionResult(result, this, localizer);
     }
 
-    [HttpGet("service/{branchId}")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get all services for a specific branch")]
-    public async Task<ActionResult> GetServicesByBranch(Guid branchId)
+    public async Task<ActionResult> GetServicesByBranch([FromQuery] Guid branchId)
     {
         var query = new GetAllServicesByBranchIdQuery(new BranchId(branchId));
         var services = await serviceQueryService.Handle(query);
@@ -75,7 +75,7 @@ public class ServicesController(
         return Ok(resources);
     }
 
-    [HttpGet("service/id/{serviceId}")]
+    [HttpGet("{serviceId}")]
     [ActionName(nameof(GetServiceById))]
     [SwaggerOperation(Summary = "Get a service by ID")]
     public async Task<ActionResult> GetServiceById(Guid serviceId)
