@@ -88,7 +88,7 @@ public class GlobalExceptionHandlerMiddleware(
         {
             Status = StatusCodes.Status500InternalServerError,
             Title = localizer["UnexpectedServerError"].Value,
-            Detail = localizer["UnexpectedErrorProcessingRequest"].Value,
+            Detail = exception.ToString(),
             Instance = context.Request.Path
         };
 
