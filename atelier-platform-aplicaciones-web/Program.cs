@@ -107,6 +107,9 @@ builder.Services.AddProblemDetails(options =>
 {
     options.CustomizeProblemDetails = context =>
     {
+        var exceptionFeature = context.HttpContext.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        if (exceptionFeature?.Error != null) System.IO.File.WriteAllText("swagger-error.txt", exceptionFeature.Error.ToString());
+        
         if (context.ProblemDetails.Status is null or >= 500)
         {
             var localizer = context.HttpContext.RequestServices.GetRequiredService<IStringLocalizer<SharedResource>>();
@@ -121,6 +124,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options => 
 {
     options.EnableAnnotations();
+    options.CustomSchemaIds(t => t.FullName);
     
     // Configuración de Seguridad para Swagger (Botón Authorize)
     options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.OpenApiSecurityScheme
@@ -236,6 +240,7 @@ builder.Services.AddScoped<ITelemetrySnapshotRepository, TelemetrySnapshotReposi
 builder.Services.AddScoped<IDtcAlertRepository, DtcAlertRepository>();
 builder.Services.AddScoped<IVehicleCommandService, VehicleCommandService>();
 builder.Services.AddScoped<IVehicleQueryService, VehicleQueryService>();
+builder.Services.AddScoped<ITelemetryCommandService, TelemetryCommandService>();
 
 // Fleet Dependencies
 builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
@@ -301,6 +306,19 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseGlobalExceptionHandler();
+
+app.Use(async (context, next) =>
+{
+    try
+    {
+        await next();
+    }
+    catch (System.Exception ex)
+    {
+        System.IO.File.WriteAllText("fatal-error.txt", ex.ToString());
+        throw;
+    }
+});
 
 app.UseCors("AllowAllPolicy");
 
