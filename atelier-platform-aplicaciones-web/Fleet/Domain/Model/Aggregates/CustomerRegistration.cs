@@ -10,6 +10,7 @@ public partial class CustomerRegistration
     public Guid BranchId { get; private set; }
     public CustomerRegistrationStatus Status { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; }
+    public DateTimeOffset UpdatedAt { get; private set; }
     public DateTimeOffset? DeletedAt { get; private set; }
 
     protected CustomerRegistration()
@@ -24,11 +25,13 @@ public partial class CustomerRegistration
         BranchId = branchId;
         Status = CustomerRegistrationStatus.ACTIVE;
         CreatedAt = DateTimeOffset.UtcNow;
+        UpdatedAt = DateTimeOffset.UtcNow;
     }
 
     public void Deactivate()
     {
         Status = CustomerRegistrationStatus.INACTIVE;
+        UpdatedAt = DateTimeOffset.UtcNow;
         DeletedAt = DateTimeOffset.UtcNow;
     }
 }

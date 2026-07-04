@@ -31,11 +31,11 @@ public class VehicleRepository(AppDbContext context) : BaseRepository<Vehicle>(c
     public async Task<IEnumerable<Vehicle>> ListAvailableForLinkingByBranchIdAsync(BranchId branchId, CancellationToken cancellationToken = default)
     {
         // 1. Get UserIds of active customers in the branch
-        var customerUserIds = await Context.Set<CustomerRegistration>()
-            .Where(cr => cr.BranchId == branchId && cr.Status == "ACTIVE")
+        var customerUserIds = await Context.Set<atelier_platform_aplicaciones_web.Fleet.Domain.Model.Aggregates.CustomerRegistration>()
+            .Where(cr => cr.BranchId == branchId.Value && cr.Status == atelier_platform_aplicaciones_web.Fleet.Domain.Model.ValueObjects.CustomerRegistrationStatus.ACTIVE)
             .Join(Context.Set<atelier_platform_aplicaciones_web.Core.Domain.Model.Aggregates.Customer>(),
                 cr => cr.CustomerId,
-                c => c.Id,
+                c => c.Id.Value,
                 (cr, c) => c.UserId.Value)
             .ToListAsync(cancellationToken);
 
