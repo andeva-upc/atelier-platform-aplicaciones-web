@@ -98,7 +98,7 @@ public class QuotesController : ControllerBase
     /// <returns>The updated Quote resource.</returns>
     [HttpPut("{id}")]
     [SwaggerOperation(Summary = "Update quote discount", Description = "Updates the discount percentage of an existing DRAFT quote")]
-    public async Task<IActionResult> UpdateQuote(Guid id, [FromBody] UpdateQuoteResource resource)
+    public async Task<IActionResult> UpdateQuoteDiscount(Guid id, [FromBody] UpdateQuoteResource resource)
     {
         var updateQuoteCommand = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.UpdateQuoteCommand(
             id,

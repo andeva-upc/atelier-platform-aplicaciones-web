@@ -120,7 +120,7 @@ public class VouchersController : ControllerBase
     /// <returns>The updated Voucher resource.</returns>
     [HttpDelete("{voucherId}/payments/{paymentId}")]
     [SwaggerOperation(Summary = "Remove a payment from a voucher", Description = "Removes a payment registered by mistake")]
-    public async Task<IActionResult> DeletePayment(System.Guid voucherId, System.Guid paymentId)
+    public async Task<IActionResult> RemovePayment(System.Guid voucherId, System.Guid paymentId)
     {
         var command = new atelier_platform_aplicaciones_web.Billing.Domain.Model.Commands.RemovePaymentCommand(voucherId, paymentId);
         var result = await _voucherCommandService.Handle(command);
