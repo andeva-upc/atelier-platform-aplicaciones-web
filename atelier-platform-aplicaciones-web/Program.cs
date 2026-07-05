@@ -347,7 +347,7 @@ void ExpandConfigurationPlaceholders(IConfiguration config)
             
             if (expanded != value)
             {
-                config[child.Path] = expanded;
+                config[child.Key] = expanded;
             }
         }
         ExpandConfigurationPlaceholders(child);
