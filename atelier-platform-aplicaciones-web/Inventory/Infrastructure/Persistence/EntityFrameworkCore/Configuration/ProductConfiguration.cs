@@ -20,7 +20,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Category)
             .HasConversion(v => v.Value, v => new atelier_platform_aplicaciones_web.Inventory.Domain.Model.ValueObjects.ProductCategory(v))
-            .HasColumnName("category_id")
+            .HasColumnName("category")
             .IsRequired();
 
         builder.Property(p => p.Name)
