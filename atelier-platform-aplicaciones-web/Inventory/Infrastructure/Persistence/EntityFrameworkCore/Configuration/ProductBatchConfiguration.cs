@@ -54,7 +54,9 @@ public class ProductBatchConfiguration : IEntityTypeConfiguration<ProductBatch>
             .IsRequired()
             .HasColumnName("branch_id");
 
-        builder.Ignore(b => b.UpdatedAt);
+        builder.Property(b => b.UpdatedAt)
+            .IsRequired()
+            .HasColumnName("updated_at");
 
         builder.Ignore(b => b.ReservedQuantity);
     }
