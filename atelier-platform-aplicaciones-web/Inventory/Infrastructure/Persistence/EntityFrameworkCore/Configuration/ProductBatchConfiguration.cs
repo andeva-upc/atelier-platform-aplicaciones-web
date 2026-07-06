@@ -8,7 +8,7 @@ public class ProductBatchConfiguration : IEntityTypeConfiguration<ProductBatch>
 {
     public void Configure(EntityTypeBuilder<ProductBatch> builder)
     {
-        builder.ToTable("inventory_batches");
+        builder.ToTable("product_batches");
 
         builder.HasKey(b => b.Id);
 
@@ -48,7 +48,7 @@ public class ProductBatchConfiguration : IEntityTypeConfiguration<ProductBatch>
 
         builder.Property(b => b.CreatedAt)
             .IsRequired()
-            .HasColumnName("entry_date");
+            .HasColumnName("created_at");
 
         builder.Property(b => b.BranchId)
             .IsRequired()
