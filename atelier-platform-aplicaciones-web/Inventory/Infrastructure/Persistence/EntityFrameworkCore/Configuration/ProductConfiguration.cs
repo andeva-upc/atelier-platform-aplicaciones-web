@@ -25,7 +25,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Name)
             .HasConversion(v => v.Name, v => new atelier_platform_aplicaciones_web.Inventory.Domain.Model.ValueObjects.ProductName(v))
-            .HasColumnName("product_name")
+            .HasColumnName("name")
             .IsRequired();
 
         builder.Property(p => p.Sku)
